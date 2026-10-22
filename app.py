@@ -1423,59 +1423,87 @@ def _webgl_map_figure(focus_key="🇮🇳 All India (Subcontinent Overview)", sh
         hoverinfo="skip", showlegend=False,
     ))
 
-    # 4. Subdivision dots sized by rainfall with customdata for instant click capture
+    # 4. Subdivision dots: All unselected in green, selected division in vibrant blue
     custom = agg[["division", "mean_rain", "cv", "trend_txt", "risk", "desc"]].values
-    fig.add_trace(go.Scattermap(
-        lat=agg["lat"], lon=agg["lon"], mode="markers",
-        marker=dict(
-            size=sizes,
-            color=agg["mean_rain"],
-            colorscale=SCALE_GREEN,
-            showscale=True,
-            coloraxis="coloraxis",
-            opacity=0.98,
-        ),
-        customdata=custom,
-        hovertemplate=HOVER,
-        name="Subdivisions",
-        showlegend=False,
-    ))
+    cd_selected = st.session_state.get("clicked_div")
 
-    # 5. Distinct vibrant blue dot + electric blue halo for active selected division (reverts to green when shifted)
-    if st.session_state.get("clicked_div"):
-        sel = agg[agg["division"] == st.session_state.clicked_div]
-        if len(sel):
-            sel_idx = sel.index[0]
-            sel_size = float(sizes[sel_idx])
-            # Outer electric blue glowing halo rings
-            fig.add_trace(go.Scattermap(
-                lat=sel["lat"], lon=sel["lon"], mode="markers",
-                marker=dict(size=sel_size + 24, color="rgba(14, 165, 233, 0.35)"),
-                showlegend=False, hoverinfo="skip",
-            ))
-            fig.add_trace(go.Scattermap(
-                lat=sel["lat"], lon=sel["lon"], mode="markers",
-                marker=dict(size=sel_size + 12, color="rgba(56, 189, 248, 0.60)"),
-                showlegend=False, hoverinfo="skip",
-            ))
-            # Foreground solid electric blue dot with crisp white border and pin label
-            fig.add_trace(go.Scattermap(
-                lat=sel["lat"], lon=sel["lon"], mode="markers+text",
-                marker=dict(
-                    size=sel_size + 4,
-                    color="#0284c7" if not _DARK else "#38bdf8",
-                    opacity=1.0,
-                ),
-                text=[f"📍 {st.session_state.clicked_div}"],
-                textposition="top center",
-                textfont=dict(
-                    size=13,
-                    color="#0369a1" if not _DARK else "#7dd3fc",
-                    family="Outfit, Inter, sans-serif",
-                ),
-                showlegend=False,
-                hoverinfo="skip",
-            ))
+    if cd_selected and cd_selected in agg["division"].values:
+        unsel_mask = (agg["division"] != cd_selected).values
+        sel_mask = (agg["division"] == cd_selected).values
+
+        unsel_agg = agg[unsel_mask]
+        unsel_sizes = sizes[unsel_mask]
+        unsel_custom = custom[unsel_mask]
+
+        sel_agg = agg[sel_mask]
+        sel_idx = sel_agg.index[0]
+        sel_size = float(sizes[sel_idx])
+        sel_custom = [custom[sel_idx]]
+
+        # Unselected subdivisions: Always GREEN
+        fig.add_trace(go.Scattermap(
+            lat=unsel_agg["lat"], lon=unsel_agg["lon"], mode="markers",
+            marker=dict(
+                size=unsel_sizes,
+                color=unsel_agg["mean_rain"],
+                colorscale=SCALE_GREEN,
+                showscale=True,
+                coloraxis="coloraxis",
+                opacity=0.98,
+            ),
+            customdata=unsel_custom,
+            hovertemplate=HOVER,
+            name="Subdivisions",
+            showlegend=False,
+        ))
+
+        # Selected subdivision: Exclusively BLUE with glowing cyan/blue halos and pin label
+        fig.add_trace(go.Scattermap(
+            lat=sel_agg["lat"], lon=sel_agg["lon"], mode="markers",
+            marker=dict(size=sel_size + 28, color="rgba(14, 165, 233, 0.40)"),
+            showlegend=False, hoverinfo="skip",
+        ))
+        fig.add_trace(go.Scattermap(
+            lat=sel_agg["lat"], lon=sel_agg["lon"], mode="markers",
+            marker=dict(size=sel_size + 14, color="rgba(56, 189, 248, 0.70)"),
+            showlegend=False, hoverinfo="skip",
+        ))
+        fig.add_trace(go.Scattermap(
+            lat=sel_agg["lat"], lon=sel_agg["lon"], mode="markers+text",
+            marker=dict(
+                size=sel_size + 6,
+                color="#0284c7" if not _DARK else "#38bdf8",
+                opacity=1.0,
+            ),
+            text=[f"📍 {cd_selected}"],
+            textposition="top center",
+            textfont=dict(
+                size=13,
+                color="#0369a1" if not _DARK else "#38bdf8",
+                family="Outfit, Inter, sans-serif",
+            ),
+            customdata=sel_custom,
+            hovertemplate=HOVER,
+            name=cd_selected,
+            showlegend=False,
+        ))
+    else:
+        # No division selected: Render all 36 subdivisions in GREEN
+        fig.add_trace(go.Scattermap(
+            lat=agg["lat"], lon=agg["lon"], mode="markers",
+            marker=dict(
+                size=sizes,
+                color=agg["mean_rain"],
+                colorscale=SCALE_GREEN,
+                showscale=True,
+                coloraxis="coloraxis",
+                opacity=0.98,
+            ),
+            customdata=custom,
+            hovertemplate=HOVER,
+            name="Subdivisions",
+            showlegend=False,
+        ))
 
     # Focus configuration
     f_cfg = FOCUS_REGIONS.get(focus_key, FOCUS_REGIONS["🇮🇳 All India (Subcontinent Overview)"])
@@ -1587,6 +1615,7 @@ if _picked:
         st.session_state.clicked_div = _picked
         st.session_state.active_place_dropdown_selector = _picked
         st.session_state.auto_scroll_to_dossier = True
+        st.rerun()
 
 # Guarantee selectbox state matches clicked_div BEFORE widget instantiation
 target_select = st.session_state.clicked_div if st.session_state.clicked_div else "-- Select a Subdivision --"
@@ -1845,15 +1874,10 @@ if CD and CD in df["division"].unique():
             hoverinfo="skip",
         ))
         fig_zoom.add_trace(go.Scattergeo(
-            lat=[lat_c], lon=[lon_c], mode="markers",
-            marker=dict(size=36, color="rgba(14, 165, 233, 0.35)"),
-            hoverinfo="skip", showlegend=False,
-        ))
-        fig_zoom.add_trace(go.Scattergeo(
             lat=[lat_c], lon=[lon_c], mode="markers+text",
-            marker=dict(size=24, color="#0284c7" if not _DARK else "#38bdf8", line=dict(width=3.2, color="#ffffff")),
-            text=[f"📍 {CD}"], textposition="top center",
-            textfont=dict(size=12, color="#0369a1" if not _DARK else "#7dd3fc", family="Outfit, Inter, sans-serif"),
+            marker=dict(size=22, color="#22c55e", line=dict(width=3, color="#ffffff")),
+            text=[CD], textposition="top center",
+            textfont=dict(size=11, color=_FG, family="Inter"),
             hoverinfo="skip", showlegend=False,
         ))
         fig_zoom.update_geos(
