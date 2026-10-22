@@ -564,8 +564,19 @@ div[data-baseweb="slider"] div:has(> div[role="slider"]) {{
 }}
 .foot b {{ color: {T['muted']}; }}
 
-/* smoother plotly cards inside charts */
+/* smoother plotly cards inside charts and clean separation from controls */
 .js-plotly-plot .plotly .main-svg {{ border-radius: 18px; }}
+[data-testid="stPlotlyChart"] {{
+  margin-bottom: 1.5rem !important;
+  position: relative;
+  z-index: 1;
+}}
+.maplibregl-ctrl-attrib, .mapboxgl-ctrl-attrib {{
+  margin-bottom: 8px !important;
+  border-radius: 6px !important;
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  padding: 2px 6px !important;
+}}
 
 
 
@@ -1280,7 +1291,7 @@ def _geo_figure():
                 showlegend=False, hoverinfo="skip",
             ))
     fig.update_layout(
-        margin=dict(l=0, r=0, t=10, b=0), height=670,
+        margin=dict(l=0, r=0, t=10, b=24), height=670,
         coloraxis_colorbar=dict(
             title=dict(text="Annual mm", font=dict(color=_TEXT_COLOR)),
             thickness=14, len=0.62,
@@ -1376,7 +1387,7 @@ def _webgl_map_figure(focus_key="🇮🇳 All India (Subcontinent Overview)", sh
     z_lvl = f_cfg.get("webgl_zoom", 4.2)
 
     fig.update_layout(
-        margin=dict(l=0, r=0, t=10, b=0),
+        margin=dict(l=0, r=0, t=10, b=32),
         height=660,
         map=dict(
             style="carto-voyager" if not _DARK else "carto-darkmatter",
@@ -1503,17 +1514,14 @@ def on_quick_jump_click(place_name):
     st.session_state.active_place_dropdown_selector = place_name
     st.session_state.auto_scroll_to_dossier = True
 
-# Place Selector and Quick-Jumps directly under the map
-st.markdown("<div style='margin-top:0.8rem;'></div>", unsafe_allow_html=True)
-c_sel1, c_sel2 = st.columns([1.1, 2.9])
+# Place Selector and Quick-Jumps directly under the map with clean spacing and no widget collision
+st.markdown("<div style='margin-top:1.4rem; clear:both;'></div>", unsafe_allow_html=True)
+c_sel1, c_sel2 = st.columns([1.25, 2.75], gap="large")
 with c_sel1:
     dropdown_options = ["-- Select a Subdivision --"] + all_divisions
-    sel_val = st.session_state.active_place_dropdown_selector
-    curr_idx = dropdown_options.index(sel_val) if sel_val in dropdown_options else 0
     st.selectbox(
         "📍 Active Place (click any dot on map or select here):",
         dropdown_options,
-        index=curr_idx,
         key="active_place_dropdown_selector",
         on_change=on_place_dropdown_change,
     )
