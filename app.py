@@ -1337,14 +1337,28 @@ def _geo_figure():
         customdata=custom, hovertemplate=HOVER,
         name="Subdivisions", showlegend=False,
     ))
-    # Glowing green selection ring on the clicked division
+    # Distinct blue marker & halo for active selected division (reverts to green when shifted)
     if st.session_state.clicked_div:
         sel = agg[agg["division"] == st.session_state.clicked_div]
         if len(sel):
+            sel_idx = sel.index[0]
+            sel_size = float(sizes[sel_idx])
             fig.add_trace(go.Scattergeo(
                 lat=sel["lat"], lon=sel["lon"], mode="markers",
-                marker=dict(size=float(sizes[sel.index[0]]) + 32, color="rgba(0,0,0,0)",
-                            line=dict(width=3.8, color="#22c55e")),
+                marker=dict(size=sel_size + 28, color="rgba(14, 165, 233, 0.35)"),
+                showlegend=False, hoverinfo="skip",
+            ))
+            fig.add_trace(go.Scattergeo(
+                lat=sel["lat"], lon=sel["lon"], mode="markers+text",
+                marker=dict(
+                    size=sel_size + 6,
+                    color="#0284c7" if not _DARK else "#38bdf8",
+                    line=dict(width=3.2, color="#ffffff"),
+                    opacity=1.0,
+                ),
+                text=[f"📍 {st.session_state.clicked_div}"],
+                textposition="top center",
+                textfont=dict(size=12, color="#0369a1" if not _DARK else "#7dd3fc", family="Outfit, sans-serif"),
                 showlegend=False, hoverinfo="skip",
             ))
     fig.update_layout(
@@ -1427,15 +1441,40 @@ def _webgl_map_figure(focus_key="🇮🇳 All India (Subcontinent Overview)", sh
         showlegend=False,
     ))
 
-    # 5. Glowing outer ring for active selected division
+    # 5. Distinct vibrant blue dot + electric blue halo for active selected division (reverts to green when shifted)
     if st.session_state.get("clicked_div"):
         sel = agg[agg["division"] == st.session_state.clicked_div]
         if len(sel):
             sel_idx = sel.index[0]
+            sel_size = float(sizes[sel_idx])
+            # Outer electric blue glowing halo rings
             fig.add_trace(go.Scattermap(
                 lat=sel["lat"], lon=sel["lon"], mode="markers",
-                marker=dict(size=float(sizes[sel_idx]) + 16, color="rgba(34, 197, 94, 0.45)"),
+                marker=dict(size=sel_size + 24, color="rgba(14, 165, 233, 0.35)"),
                 showlegend=False, hoverinfo="skip",
+            ))
+            fig.add_trace(go.Scattermap(
+                lat=sel["lat"], lon=sel["lon"], mode="markers",
+                marker=dict(size=sel_size + 12, color="rgba(56, 189, 248, 0.60)"),
+                showlegend=False, hoverinfo="skip",
+            ))
+            # Foreground solid electric blue dot with crisp white border and pin label
+            fig.add_trace(go.Scattermap(
+                lat=sel["lat"], lon=sel["lon"], mode="markers+text",
+                marker=dict(
+                    size=sel_size + 4,
+                    color="#0284c7" if not _DARK else "#38bdf8",
+                    opacity=1.0,
+                ),
+                text=[f"📍 {st.session_state.clicked_div}"],
+                textposition="top center",
+                textfont=dict(
+                    size=13,
+                    color="#0369a1" if not _DARK else "#7dd3fc",
+                    family="Outfit, Inter, sans-serif",
+                ),
+                showlegend=False,
+                hoverinfo="skip",
             ))
 
     # Focus configuration
@@ -1806,10 +1845,15 @@ if CD and CD in df["division"].unique():
             hoverinfo="skip",
         ))
         fig_zoom.add_trace(go.Scattergeo(
+            lat=[lat_c], lon=[lon_c], mode="markers",
+            marker=dict(size=36, color="rgba(14, 165, 233, 0.35)"),
+            hoverinfo="skip", showlegend=False,
+        ))
+        fig_zoom.add_trace(go.Scattergeo(
             lat=[lat_c], lon=[lon_c], mode="markers+text",
-            marker=dict(size=22, color="#22c55e", line=dict(width=3, color="#ffffff")),
-            text=[CD], textposition="top center",
-            textfont=dict(size=11, color=_FG, family="Inter"),
+            marker=dict(size=24, color="#0284c7" if not _DARK else "#38bdf8", line=dict(width=3.2, color="#ffffff")),
+            text=[f"📍 {CD}"], textposition="top center",
+            textfont=dict(size=12, color="#0369a1" if not _DARK else "#7dd3fc", family="Outfit, Inter, sans-serif"),
             hoverinfo="skip", showlegend=False,
         ))
         fig_zoom.update_geos(
