@@ -578,6 +578,63 @@ div[data-baseweb="slider"] div:has(> div[role="slider"]) {{
   padding: 2px 6px !important;
 }}
 
+/* Fact Sheet Quadrilateral Cards */
+.fact-quad-card {{
+  background: {T['card2']};
+  border: 1px solid {T['border']};
+  border-radius: 14px;
+  padding: 1.15rem 1.25rem;
+  box-shadow: {T['shadow']};
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}}
+.fact-quad-card:hover {{
+  transform: translateY(-2px);
+  border-color: {T['hover']};
+  box-shadow: {T['shadow_hover']};
+}}
+.fact-quad-badge {{
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.70rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 0.55rem;
+  width: fit-content;
+}}
+.fact-quad-title {{
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: {T['title']};
+  margin-bottom: 0.25rem;
+  line-height: 1.25;
+}}
+.fact-quad-metric {{
+  font-size: 1.55rem;
+  font-weight: 850;
+  color: {T['value']};
+  margin-bottom: 0.45rem;
+  line-height: 1.1;
+}}
+.fact-quad-body {{
+  font-size: 0.84rem;
+  color: {T['muted']};
+  line-height: 1.55;
+}}
+.fact-quad-body ul {{
+  margin: 0.25rem 0 0 0;
+  padding-left: 1.1rem;
+}}
+.fact-quad-body li {{
+  margin-bottom: 0.3rem;
+}}
+
 
 
 /* ═════════════════════════════════════════════════════════════════════════════
@@ -1824,13 +1881,19 @@ if CD and CD in df["division"].unique():
         st.markdown(f'<div class="kpi {risk_kpi_cls}" style="margin:0"><div class="v">{risk_c}</div><div class="l">Drought Vulnerability Class<br><small>{severe_dry} of {n_years} yrs in drought (&lt;75%)</small></div></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="kpi" style="margin:10px 0 0"><div class="v">{p5:,.0f} mm</div><div class="l">1-in-20-Year Low (5th Pct)<br><small>Extreme drought benchmark</small></div></div>', unsafe_allow_html=True)
 
+    # Deficit severity counts
+    normal_yrs = int((ann_c["rainfall_mm"] >= mean_c * 0.90).sum())
+    mild_yrs = int(((ann_c["rainfall_mm"] < mean_c * 0.90) & (ann_c["rainfall_mm"] >= mean_c * 0.75)).sum())
+    severe_yrs = int((ann_c["rainfall_mm"] < mean_c * 0.75).sum())
+
     # ── Tabs: Exclusively Dedicated to THIS Place ────────────────────────────
     st.markdown("<div style='margin-top:1.4rem;'></div>", unsafe_allow_html=True)
-    tab_series, tab_seas, tab_trend, tab_extremes = st.tabs([
+    tab_series, tab_seas, tab_trend, tab_extremes, tab_conclusions = st.tabs([
         "📊 Annual Series & Decades",
         "🌧️ Seasonal Breakdown",
         "📈 Long-Term Trend & Probability",
         "📜 Historical Records & Extremes Log",
+        "📋 Key Takeaways & Fact Sheet",
     ])
 
     # ── TAB 1: ANNUAL TIME SERIES & DECADES ──────────────────────────────────
@@ -2115,6 +2178,207 @@ if CD and CD in df["division"].unique():
             st.markdown(f'<div class="kpi amber" style="margin:0"><div class="v">{mild_yrs} / {n_years}</div><div class="l">Mild Deficit Years (75–90% normal)<br><small>{(mild_yrs/n_years*100):.1f}% of historical record</small></div></div>', unsafe_allow_html=True)
         with fc3:
             st.markdown(f'<div class="kpi" style="margin:0; border-color:rgba(239,68,68,0.4);"><div class="v" style="color:#ef4444;">{severe_yrs} / {n_years}</div><div class="l">Severe Drought Years (&lt;75% normal)<br><small>{(severe_yrs/n_years*100):.1f}% of historical record</small></div></div>', unsafe_allow_html=True)
+
+    # ── TAB 5: KEY TAKEAWAYS & EMPIRICAL FACT SHEET ──────────────────────────
+    with tab_conclusions:
+        st.markdown(f"#### 📋 Key Historical Takeaways & Empirical Fact Sheet — {CD}")
+
+        # Top summary alert banner emphasizing no predictions, strictly empirical facts
+        st.markdown(f"""
+        <div style="background:{'rgba(34,197,94,0.08)' if _DARK else 'rgba(21,128,61,0.06)'}; border:1px solid {'rgba(34,197,94,0.3)' if _DARK else 'rgba(21,128,61,0.25)'}; border-radius:14px; padding:12px 18px; margin-bottom:1.3rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="font-weight:800; font-size:0.95rem; color:{'#22c55e' if _DARK else '#15803d'};">
+              📌 Plain Fact Sheet &amp; Observational Conclusions (1901–2015 Record)
+            </div>
+            <div style="font-size:0.83rem; color:{T['muted']}; margin-top:3px;">
+              <b>No Predictive Models:</b> All takeaways below are empirical facts calculated directly from 115 years of recorded IMD observations for <b>{CD}</b>. Designed for rapid review without analyzing graphs.
+            </div>
+          </div>
+          <span style="background:{'rgba(34,197,94,0.18)' if _DARK else 'rgba(21,128,61,0.12)'}; color:{'#22c55e' if _DARK else '#15803d'}; border:1px solid {'rgba(34,197,94,0.4)' if _DARK else 'rgba(21,128,61,0.3)'}; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:800; letter-spacing:0.04em;">
+            115-YEAR GROUND TRUTH
+          </span>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Computation of decadal and empirical statistics
+        ann_c_dec = ann_c.copy()
+        ann_c_dec["decade"] = (ann_c_dec["year"] // 10) * 10
+        dec_means = ann_c_dec.groupby("decade")["rainfall_mm"].mean()
+        wettest_dec_yr = int(dec_means.idxmax())
+        wettest_dec_val = float(dec_means.max())
+        driest_dec_yr = int(dec_means.idxmin())
+        driest_dec_val = float(dec_means.min())
+        recent_dec_val = float(dec_means.get(2000, dec_means.iloc[-1]))
+        recent_diff_pct = ((recent_dec_val - mean_c) / mean_c * 100) if mean_c else 0
+
+        # Stability categorization
+        if cv_c < 18.0:
+            cv_label = "High Stability (Steady Annual Rains)"
+            cv_badge_col = "#22c55e"
+            cv_badge_bg = "rgba(34,197,94,0.15)" if _DARK else "rgba(21,128,61,0.12)"
+            cv_summary = f"With a low CV of {cv_c:.1f}%, {CD} experiences consistent precipitation year after year with minimal percentage fluctuations around its mean."
+        elif cv_c < 28.0:
+            cv_label = "Moderate Stability (Normal Variations)"
+            cv_badge_col = "#38bdf8"
+            cv_badge_bg = "rgba(56,189,248,0.15)" if _DARK else "rgba(3,105,161,0.12)"
+            cv_summary = f"With a moderate CV of {cv_c:.1f}%, annual rainfall fluctuates within expected climatic bounds, showing reasonable interannual predictability."
+        elif cv_c < 36.0:
+            cv_label = "High Volatility (Erratic Interannual Swings)"
+            cv_badge_col = "#f59e0b"
+            cv_badge_bg = "rgba(245,158,11,0.15)" if _DARK else "rgba(180,83,9,0.12)"
+            cv_summary = f"With a high CV of {cv_c:.1f}%, precipitation is volatile; bumper water years and severe dry spells alternate frequently across the record."
+        else:
+            cv_label = "Extreme Volatility (Unreliable Precipitation)"
+            cv_badge_col = "#ef4444"
+            cv_badge_bg = "rgba(239,68,68,0.15)" if _DARK else "rgba(185,28,28,0.12)"
+            cv_summary = f"With an extreme CV of {cv_c:.1f}%, annual rainfall is erratic with large percentage dispersion relative to its mean."
+
+        # Trend summary
+        if p_c < 0.05:
+            if slope_c > 0:
+                trend_title = "Statistically Significant Upward Drift"
+                trend_badge_col = "#22c55e"
+                trend_badge_bg = "rgba(34,197,94,0.15)" if _DARK else "rgba(21,128,61,0.12)"
+                trend_badge_text = "SIGNIFICANT INCREASE"
+                trend_desc = f"An observational upward trend of {slope_c:+.2f} mm/yr ({slope_c*10:+.1f} mm/decade, p = {p_c:.4f} &lt; 0.05) was verified in the historical data."
+            else:
+                trend_title = "Statistically Significant Downward Drift"
+                trend_badge_col = "#ef4444"
+                trend_badge_bg = "rgba(239,68,68,0.15)" if _DARK else "rgba(185,28,28,0.12)"
+                trend_badge_text = "SIGNIFICANT DECREASE"
+                trend_desc = f"An observational downward trend of {slope_c:+.2f} mm/yr ({slope_c*10:+.1f} mm/decade, p = {p_c:.4f} &lt; 0.05) was verified in the historical data."
+        else:
+            trend_title = "Stationary Long-Term Pattern"
+            trend_badge_col = "#64748b" if _DARK else "#4b5563"
+            trend_badge_bg = "rgba(100,116,139,0.15)" if _DARK else "rgba(100,116,139,0.12)"
+            trend_badge_text = "NO SECULAR TREND"
+            trend_desc = f"Observed slope is {slope_c:+.2f} mm/yr, but p = {p_c:.3f} &ge; 0.05 confirms this is not statistically distinguishable from random historical fluctuations."
+
+        spread_ratio = (wet_val / dry_val) if dry_val > 0 else 0
+        median_c = float(ann_c["rainfall_mm"].median()) if n_years else mean_c
+        skew_c = float(_stats.skew(ann_c["rainfall_mm"])) if n_years > 2 else 0
+        normal_band_yrs = int(((ann_c["rainfall_mm"] >= mean_c * 0.8) & (ann_c["rainfall_mm"] <= mean_c * 1.2)).sum())
+
+        # Row 1 of Quadrilateral Fact Boxes
+        qcol1, qcol2, qcol3 = st.columns(3)
+        with qcol1:
+            st.markdown(f"""
+            <div class="fact-quad-card">
+              <span class="fact-quad-badge" style="background:{'rgba(56,189,248,0.15)' if _DARK else 'rgba(3,105,161,0.12)'}; color:{T['blue']};">
+                🌧️ VOLUME &amp; SPREAD
+              </span>
+              <div class="fact-quad-title">Annual Rain Baseline</div>
+              <div class="fact-quad-metric">{mean_c:,.0f} mm</div>
+              <div class="fact-quad-body">
+                <ul>
+                  <li><b>Median Precipitation:</b> {median_c:,.0f} mm/year.</li>
+                  <li><b>Standard Deviation:</b> ±{std_c:,.0f} mm dispersion.</li>
+                  <li><b>Recorded Range:</b> {dry_val:,.0f} mm ({dry_year}) to {wet_val:,.0f} mm ({wet_year}).</li>
+                  <li><b>Spread Ratio:</b> Wettest year was <b>{spread_ratio:.1f}×</b> wetter than the driest.</li>
+                </ul>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with qcol2:
+            st.markdown(f"""
+            <div class="fact-quad-card">
+              <span class="fact-quad-badge" style="background:{'rgba(168,85,247,0.15)' if _DARK else 'rgba(107,33,168,0.12)'}; color:{T['purple']};">
+                🗓️ SEASONAL BREAKDOWN
+              </span>
+              <div class="fact-quad-title">Monsoon Share (Jun–Sep)</div>
+              <div class="fact-quad-metric">{monsoon_pct:.1f}%</div>
+              <div class="fact-quad-body">
+                <ul>
+                  <li><b>Monsoon Bulk:</b> <b>{mon_mm:,.0f} mm</b> received during Jun–Sep.</li>
+                  <li><b>Post-Monsoon (OND):</b> {post_mm:,.0f} mm ({(post_mm/total_seas*100) if total_seas else 0:.1f}% of total).</li>
+                  <li><b>Pre-Monsoon (MAM):</b> {pre_mm:,.0f} mm ({(pre_mm/total_seas*100) if total_seas else 0:.1f}% of total).</li>
+                  <li><b>Winter (DJF):</b> {win_mm:,.0f} mm ({(win_mm/total_seas*100) if total_seas else 0:.1f}% of total).</li>
+                  <li>{'Strong single-season monsoon dependency.' if monsoon_pct >= 75 else 'Bimodal rainfall regime with significant post-monsoon contribution.'}</li>
+                </ul>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with qcol3:
+            st.markdown(f"""
+            <div class="fact-quad-card">
+              <span class="fact-quad-badge" style="background:{cv_badge_bg}; color:{cv_badge_col};">
+                📊 STABILITY INDEX
+              </span>
+              <div class="fact-quad-title">Interannual Predictability</div>
+              <div class="fact-quad-metric">CV {cv_c:.1f}%</div>
+              <div class="fact-quad-body">
+                <ul>
+                  <li><b>Category:</b> {cv_label.split('(')[0].strip()}.</li>
+                  <li>{cv_summary}</li>
+                  <li><b>Steady Band:</b> In <b>{normal_band_yrs} of {n_years} yrs</b> ({(normal_band_yrs/n_years*100):.1f}%), rain stayed within ±20% of normal.</li>
+                  <li><b>Distribution Skew:</b> {skew_c:+.2f} ({'moderately right-skewed' if skew_c > 0.3 else 'near-symmetric' if abs(skew_c) <= 0.3 else 'left-skewed'}).</li>
+                </ul>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<div style='margin-top:1.1rem;'></div>", unsafe_allow_html=True)
+
+        # Row 2 of Quadrilateral Fact Boxes
+        qcol4, qcol5, qcol6 = st.columns(3)
+        with qcol4:
+            st.markdown(f"""
+            <div class="fact-quad-card">
+              <span class="fact-quad-badge" style="background:{'rgba(239,68,68,0.15)' if _DARK else 'rgba(185,28,28,0.12)'}; color:#ef4444;">
+                ⚠️ DEFICIT HISTORY
+              </span>
+              <div class="fact-quad-title">Historical Drought Rate</div>
+              <div class="fact-quad-metric">{severe_yrs} / {n_years} Yrs</div>
+              <div class="fact-quad-body">
+                <ul>
+                  <li><b>Normal or Above (&ge;90%):</b> <b>{normal_yrs} yrs</b> ({(normal_yrs/n_years*100):.1f}% of record).</li>
+                  <li><b>Mild Deficit (75%–90%):</b> <b>{mild_yrs} yrs</b> ({(mild_yrs/n_years*100):.1f}% of record).</li>
+                  <li><b>Severe Drought (&lt;75%):</b> <b>{severe_yrs} yrs</b> ({(severe_yrs/n_years*100):.1f}% of record).</li>
+                  <li><b>1-in-20-Yr Benchmark:</b> Empirical 5th percentile is <b>{p5:,.0f} mm</b> ({((mean_c-p5)/mean_c*100):.1f}% below normal).</li>
+                </ul>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with qcol5:
+            st.markdown(f"""
+            <div class="fact-quad-card">
+              <span class="fact-quad-badge" style="background:{trend_badge_bg}; color:{trend_badge_col};">
+                📈 {trend_badge_text}
+              </span>
+              <div class="fact-quad-title">{trend_title}</div>
+              <div class="fact-quad-metric">{slope_c:+.2f} mm/yr</div>
+              <div class="fact-quad-body">
+                <ul>
+                  <li><b>115-Yr OLS Slope:</b> {slope_c:+.2f} mm per calendar year.</li>
+                  <li><b>Statistical Significance:</b> p = <b>{p_c:.4f}</b> {'(&lt; 0.05 significant)' if p_c < 0.05 else '(&ge; 0.05 not significant)'}.</li>
+                  <li><b>Net Historical Shift:</b> <b>{slope_c*115:+.0f} mm</b> across the 1901–2015 observation window.</li>
+                  <li><b>Observation only:</b> Represents historical ledger; no future trajectory is implied.</li>
+                </ul>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with qcol6:
+            st.markdown(f"""
+            <div class="fact-quad-card">
+              <span class="fact-quad-badge" style="background:{'rgba(245,158,11,0.15)' if _DARK else 'rgba(180,83,9,0.12)'}; color:{T['amber']};">
+                🏛️ DECADAL EPOCHS
+              </span>
+              <div class="fact-quad-title">Historical Decade Extremes</div>
+              <div class="fact-quad-metric">{wettest_dec_yr}s vs {driest_dec_yr}s</div>
+              <div class="fact-quad-body">
+                <ul>
+                  <li><b>Wettest Decade:</b> {wettest_dec_yr}s averaged <b>{wettest_dec_val:,.0f} mm/yr</b> ({((wettest_dec_val-mean_c)/mean_c*100):+.1f}% vs normal).</li>
+                  <li><b>Driest Decade:</b> {driest_dec_yr}s averaged <b>{driest_dec_val:,.0f} mm/yr</b> ({((driest_dec_val-mean_c)/mean_c*100):+.1f}% vs normal).</li>
+                  <li><b>Recent Era (2000s–2015):</b> Averaged <b>{recent_dec_val:,.0f} mm/yr</b> ({recent_diff_pct:+.1f}% vs baseline).</li>
+                  <li>Documents multi-decadal oscillation without making forward predictions.</li>
+                </ul>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
