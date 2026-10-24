@@ -208,8 +208,8 @@ function renderNational(national) {
 
   $("series-caption").innerHTML = isMonsoon
     ? `All-India Jun–Sep rainfall, 1901–2026 (bars coloured by % departure; dashed line = 1901–2015 mean ${Math.round(base)} mm). ` +
-      `2026 in progress at ${national.monsoon[national.years.indexOf(2026)]} mm (${national.monsoon_dep[national.years.indexOf(2026)]}%).`
-    : `All-India annual rainfall, 1901–2025 (2026 incomplete). Blue = historical record, amber = the recovered observed decade; dashed line = 1901–2015 mean ${Math.round(base)} mm.`;
+      `2026 in progress: ${national.monsoon[national.years.indexOf(2026)]} mm (${national.monsoon_dep[national.years.indexOf(2026)]}%), Jun–Sep only — provisional; compare with full seasons in prior years.`
+    : `All-India annual rainfall, 1901–2025 (2026 annual total not yet complete — never mixed in). Blue = historical record, amber = the recovered observed decade; dashed line = 1901–2015 mean ${Math.round(base)} mm.`;
 
   for (const b of $("series-pills").children) {
     b.classList.toggle("active", b.dataset.s === state.series);

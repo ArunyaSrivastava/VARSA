@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 VARSA Explorer — Indian Rainfall Analytics
-Streamlit dashboard for 36 meteorological subdivisions, 1901-2015.
+Streamlit dashboard for 36 meteorological subdivisions, 1901-2026.
 
 Run with: streamlit run app.py
 """
@@ -847,6 +847,102 @@ def load_national_2026() -> dict | None:
             "dep": float(r["jun_sep_dep"])}
 
 
+# Pipeline division name -> canonical IMD subdivision name used by the observed
+# layer (same mapping as load_unified_subdivisions).
+PIPE_TO_CANON = {
+    "Orissa": "ODISHA", "Coastal Odisha": "ODISHA",
+    "Uttarakhand": "UTTARAKHAND", "Uttaranchal": "UTTARAKHAND",
+    "Gangetic West Bengal": "GANGETIC W.B.",
+    "Sub-Montane West Bengal": "SUB-HIMALAYAN W.B. & SIKKIM",
+    "Sikkim": "SUB-HIMALAYAN W.B. & SIKKIM",
+    "Jammu & Kashmir": "JAMMU & KASHMIR", "Ladakh": "JAMMU & KASHMIR",
+    "Cold Desert (HP & UK)": "HIMACHAL PRADESH",
+    "Haryana, Delhi & Chandigarh": "HARYANA-CHD-DELHI",
+    "East Uttar Pradesh": "EAST U.P.", "West Uttar Pradesh": "WEST U.P.",
+    "North West Uttar Pradesh": "WEST U.P.",
+    "East Rajasthan": "EAST RAJASTHAN", "West Rajasthan": "WEST RAJASTHAN",
+    "Madhya Bharat": "WEST M.P.", "Madhya Maharashtra": "MADHYA MAHARASHTRA",
+    "Chhattisgarh": "CHHATTISGARH", "Bihar": "BIHAR", "Jharkhand": "JHARKHAND",
+    "Coast Andhra Pradesh": "COASTAL A.P.",
+    "Telangana": "TELANGANA", "Rayalaseema": "RAYALASEEMA",
+    "Tamil Nadu": "TAMIL NADU", "Coastal Karnataka": "COASTAL KARNATAKA",
+    "North Interior Karnataka": "NORTH INTERIOR KARNATAKA",
+    "South Interior Karnataka": "SOUTH INTERIOR KARNATAKA",
+    "Kerala": "KERALA", "Lakshadweep": "LAKSHADWEEP",
+    "Arunachal Pradesh": "ARUNACHAL PRADESH", "Assam & Meghalaya": "ASSAM & MEGHALAYA",
+    "Himachal Pradesh": "HIMACHAL PRADESH", "Punjab": "PUNJAB",
+    "Gujarat Region": "GUJARAT REGION", "Konkan & Goa": "KONKAN & GOA",
+    "Vidarbha": "VIDARBHA", "Marathwada": "MARATHAWADA",
+}
+
+# Observed seasons that share the pipeline definition (annual = calendar year,
+# monsoon/pre/post-monsoon identical). Observed WINTER is Jan-Feb vs the
+# pipeline's Dec-Feb, so it is never merged silently.
+OBS_SEASONS_MERGEABLE = {"JAS": "MONSOON", "MAM": "PREMONSOON", "OND": "POSTMONSOON", "ANNUAL": "ANNUAL"}
+
+
+@st.cache_data(show_spinner=False)
+def observed_rows_for_division(canon_name: str, include_winter: bool = False) -> pd.DataFrame:
+    """Observed IMD rows (2016-2025) for one canonical subdivision, in the
+    pipeline schema (year, division, season, rainfall_mm + layer tag).
+    Winter rows are excluded unless explicitly requested (definition differs)."""
+    if not OBS_SUBDIVISIONS.exists() or canon_name is None:
+        return pd.DataFrame(columns=["year", "division", "season", "rainfall_mm", "layer"])
+    obs = pd.read_csv(OBS_SUBDIVISIONS)
+    obs = obs[obs["division"] == canon_name]
+    season_map = dict(OBS_SEASONS_MERGEABLE)
+    if include_winter:
+        season_map["WINTER"] = "DJF"
+    obs = obs[obs["season"].isin(season_map)]
+    return pd.DataFrame({
+        "year": obs["year"].astype(int),
+        "division": canon_name,
+        "season": obs["season"].map(season_map),
+        "rainfall_mm": obs["actual_mm"],
+        "pct_dep": obs["pct_dep"],
+        "layer": "observed IMD",
+    })
+
+
+@st.cache_data(show_spinner=False)
+def load_national_extended() -> pd.DataFrame:
+    """All-India annual series across layers: pipeline mean of 36 divisions
+    (1901-2015) + observed IMD annual (2016-2025; 2026 has no annual total yet).
+    Columns: year, mm, layer. Monsoon Jun-Sep (observed, incl. provisional 2026)
+    is attached as monsoon_mm/monsoon_dep where available."""
+    base = (
+        df[df["season"] == "ANNUAL"]
+        .groupby("year")["rainfall_mm"]
+        .mean()
+        .rename("mm")
+        .reset_index()
+    )
+    base["layer"] = "pipeline (generated)"
+    out = base
+    if OBS_NATIONAL_MONTHLY.exists():
+        m = pd.read_csv(OBS_NATIONAL_MONTHLY)
+        ai = m[(m["region"] == "ALL INDIA") & (m["month"] == "ANNUAL")][["year", "rainfall_mm"]]
+        ai = ai[ai["rainfall_mm"].notna() & (ai["year"] > 2015)]
+        obs = pd.DataFrame({
+            "year": ai["year"].astype(int), "mm": ai["rainfall_mm"].astype(float),
+            "layer": "observed IMD",
+        })
+        out = pd.concat([out, obs], ignore_index=True)
+    if OBS_NATIONAL_MONSOON.exists():
+        mon = pd.read_csv(OBS_NATIONAL_MONSOON)
+        mon = mon[mon["region"] == "ALL INDIA"][["year", "jun_sep", "jun_sep_dep"]]
+        mon.columns = ["year", "monsoon_mm", "monsoon_dep"]
+        mon["year"] = mon["year"].astype(int)
+        # outer merge so monsoon-only years (2026 in progress) survive even
+        # though they have no annual total yet
+        out = out.merge(mon, on="year", how="outer")
+        out["layer"] = out["layer"].fillna("observed IMD (monsoon only, provisional)")
+    else:
+        out["monsoon_mm"] = np.nan
+        out["monsoon_dep"] = np.nan
+    return out.sort_values("year").reset_index(drop=True)
+
+
 def _dep_color(dep: float) -> list:
     """%departure -> RGB for the prism map."""
     if dep is None or (isinstance(dep, float) and np.isnan(dep)):
@@ -1003,7 +1099,7 @@ st.sidebar.markdown(f"""
     </div>
   </div>
   <div style="font-size:11.5px; color:{T['muted']}; line-height:1.45;">
-    Meteorological Almanac of India · 1901–2015
+    Meteorological Almanac of India · 1901–2026
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -1041,8 +1137,15 @@ selected_divisions = st.sidebar.multiselect(
     help="Pick specific subdivisions for focused comparison or keep all for pan-India overview",
 )
 
-year_min, year_max = int(df["year"].min()), int(df["year"].max())
-year_range = st.sidebar.slider("Historical Record Range", year_min, year_max, (year_min, year_max))
+# Coverage: pipeline layer 1901–2015; observed IMD layer extends subdivisions to
+# 2025 (2020 quality-gated) and the national monsoon to 2026 (year in progress).
+YEAR_MAX_DISPLAY = 2026
+year_min, year_max = int(df["year"].min()), YEAR_MAX_DISPLAY
+_year_help = ("1901–2015: pipeline layer (generated, IMD-calibrated). "
+              "2016–2025: observed IMD values (2020 excluded — unverifiable source table). "
+              "2026: national monsoon complete (−12.6%); subdivision values not yet published.")
+year_range = st.sidebar.slider("Historical Record Range", year_min, year_max, (year_min, year_max),
+                               help=_year_help)
 
 # ── Sidebar Archive Stats Card ───────────────────────────────────────────────
 st.sidebar.markdown(f"""
@@ -1056,15 +1159,19 @@ st.sidebar.markdown(f"""
   </div>
   <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:12px;">
     <span style="color:{T['muted']};">Time Span:</span>
-    <b style="color:{T['title']};">115 Years (1901–2015)</b>
+    <b style="color:{T['title']};">125 Years (1901–2026)</b>
+  </div>
+  <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:12px;">
+    <span style="color:{T['muted']};">Pipeline:</span>
+    <b style="color:{T['title']};">1901–2015</b>
   </div>
   <div style="display:flex; justify-content:space-between; font-size:12px;">
-    <span style="color:{T['muted']};">Total Records:</span>
-    <b style="color:{T['accent']};">4,140 Station Years</b>
+    <span style="color:{T['muted']};">Observed IMD:</span>
+    <b style="color:{T['accent']};">2016–2025 (+2026 national)</b>
   </div>
 </div>
 <div style="margin-top:14px; text-align:center; font-size:10.5px; color:{T['muted']}; line-height:1.5;">
-  IMD Subdivisional Monthly Precipitation Series<br>
+  IMD Subdivisional Precipitation Series · observed layer via IMD Pune ACS + CMPG<br>
   <b>VARSA</b> · Probability &amp; Statistics · BAMAT207
 </div>
 """, unsafe_allow_html=True)
@@ -1078,7 +1185,7 @@ with c_hero_main:
     <div class="hero" style="margin-bottom:0; height:100%; display:flex; flex-direction:column; justify-content:center;">
       <div class="tag">VARSA · Variability, Anomalies and Regional Statistics</div>
       <h1>Explorer — Indian Rainfall Analytics</h1>
-      <p>Seasonality · variability · distributions · trends across 36 meteorological subdivisions, 1901–2015</p>
+      <p>Seasonality · variability · distributions · trends across 36 meteorological subdivisions, 1901–2026</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1108,8 +1215,8 @@ st.markdown("""
 <div class="kpi-row">
   <div class="kpi green"><div class="v">75.2%</div><div class="l">of rain falls Jun–Sep</div></div>
   <div class="kpi blue"><div class="v">36</div><div class="l">meteorological subdivisions</div></div>
-  <div class="kpi purple"><div class="v">115</div><div class="l">years of records (1901–2015)</div></div>
-  <div class="kpi amber"><div class="v">23/115</div><div class="l">years below 90% of normal</div></div>
+  <div class="kpi purple"><div class="v">125</div><div class="l">years of records (1901–2026)</div></div>
+  <div class="kpi amber"><div class="v">23/115</div><div class="l">years below 90% of normal (1901–2015)</div></div>
   <div class="kpi"><div class="v">η²=0.875</div><div class="l">region explains 87% of variance</div></div>
 </div>
 """, unsafe_allow_html=True)
@@ -1276,6 +1383,23 @@ else:  # MAP_STYLE_GLOBE
 # ── Aggregate stats per division (within year filter) ────────────────────────
 map_df = df[(df["season"] == "ANNUAL") & df["division"].isin(selected_divisions)]
 map_df = map_df[(map_df["year"] >= year_range[0]) & (map_df["year"] <= year_range[1])]
+# Extend with observed IMD annual values (2016–2025) for every selected division
+# that maps to a canonical IMD subdivision. Annual = calendar year in both layers.
+# Divisions that fold into one IMD subdivision (Ladakh, Sikkim, …) share the
+# observed decade as a documented proxy; every row keeps its layer tag.
+if year_range[1] > 2015:
+    _obs_map_frames = []
+    for _pd_name in map_df["division"].unique():
+        _cn = PIPE_TO_CANON.get(_pd_name)
+        if _cn:
+            _o = observed_rows_for_division(_cn)
+            if not _o.empty:
+                _o = _o[(_o["season"] == "ANNUAL")
+                        & (_o["year"] >= year_range[0]) & (_o["year"] <= year_range[1])].copy()
+                _o["division"] = _pd_name
+                _obs_map_frames.append(_o)
+    if _obs_map_frames:
+        map_df = pd.concat([map_df, pd.concat(_obs_map_frames, ignore_index=True)], ignore_index=True)
 agg = map_df.groupby("division")["rainfall_mm"].agg(["mean", "std", "min", "max", "count"]).reset_index()
 agg.columns = ["division", "mean_rain", "std_rain", "min_rain", "max_rain", "n"]
 agg["cv"] = (agg["std_rain"] / agg["mean_rain"]) * 100
@@ -1933,9 +2057,21 @@ with c_sel2:
 # SECTION 2 — DEDICATED PLACE CLIMATE DOSSIER: THAT PLACE ONLY (NO COMPARISON)
 # ════════════════════════════════════════════════════════════════════════════
 if CD and CD in df["division"].unique():
+    # Pipeline layer (1901–2015) + observed IMD annual rows (2016–2025) where the
+    # division maps to a canonical IMD subdivision. Annual = calendar year in both
+    # layers, so merging is definitional-safe; every row keeps its layer tag.
     ann_c = df[(df["division"] == CD) & (df["season"] == "ANNUAL")].copy().sort_values("year")
+    _canon = PIPE_TO_CANON.get(CD)
+    _obs_ann = observed_rows_for_division(_canon)
+    if not _obs_ann.empty:
+        ann_c = pd.concat([ann_c, _obs_ann], ignore_index=True)
     ann_c = ann_c[(ann_c["year"] >= year_range[0]) & (ann_c["year"] <= year_range[1])]
+    ann_c = ann_c.sort_values("year").reset_index(drop=True)
+    _is_obs = (ann_c.get("layer") == "observed IMD") if "layer" in ann_c.columns else pd.Series(False, index=ann_c.index)
     n_years = len(ann_c)
+    n_obs_years = int(_is_obs.sum())
+    span_lo, span_hi = int(ann_c["year"].min()), int(ann_c["year"].max())
+    span_years = span_hi - span_lo + 1
     mean_c = ann_c["rainfall_mm"].mean()
     std_c = ann_c["rainfall_mm"].std()
     cv_c = std_c / mean_c * 100 if mean_c else 0
@@ -1957,8 +2093,17 @@ if CD and CD in df["division"].unique():
     p_c = float(2 * _stats.t.sf(abs(t_c), max(n_years - 2, 1))) if n_years > 3 else 1.0
     lat_c, lon_c = DIV_COORDS[CD]
 
-    # Seasonal breakdown for this place
+    # Seasonal breakdown for this place. Monsoon/pre/post-monsoon share IMD's
+    # definition in both layers and are extended with observed rows; WINTER is
+    # Dec–Feb in the pipeline but Jan–Feb in the observed layer, so it stays
+    # pipeline-only (1901–2015) and is labelled as such.
     seas_c = df[(df["division"] == CD) & (df["season"] != "ANNUAL")]
+    _canon_seas = observed_rows_for_division(_canon)
+    if not _canon_seas.empty:
+        _canon_seas = _canon_seas[_canon_seas["season"] != "ANNUAL"]
+        _canon_seas["division"] = CD  # keep the dossier keyed on the pipeline name
+        seas_c = pd.concat([seas_c, _canon_seas], ignore_index=True)
+    seas_c = seas_c[(seas_c["year"] >= year_range[0]) & (seas_c["year"] <= year_range[1])]
     seas_means = seas_c.groupby("season")["rainfall_mm"].mean()
     mon_mm = seas_means.get("JAS", 0)
     post_mm = seas_means.get("OND", 0)
@@ -2058,7 +2203,7 @@ if CD and CD in df["division"].unique():
               <span class="badge" style="vertical-align:middle; margin-left:8px;">Particular Place Focus</span>
             </h2>
             <p class="sect-sub" style="margin:0; font-size:0.88rem;">
-              <b>Terrain:</b> {DIV_DESC.get(CD, "")} · <b>Coordinates:</b> {lat_c}°N, {lon_c}°E · <b>Observations:</b> {year_range[0]}–{year_range[1]} ({n_years} years record). <i>Exclusively focused on {CD} (not in comparison with others).</i>
+              <b>Terrain:</b> {DIV_DESC.get(CD, "")} · <b>Coordinates:</b> {lat_c}°N, {lon_c}°E · <b>Observations:</b> {span_lo}–{span_hi} ({span_years} years: {n_years - n_obs_years} pipeline + {n_obs_years} observed IMD). <i>Exclusively focused on {CD} (not in comparison with others).</i>
             </p>
           </div>
         </div>
@@ -2168,7 +2313,7 @@ if CD and CD in df["division"].unique():
             </div>
             <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:0.2rem;">
               <div style="font-size:2rem; font-weight:850; color:{T['value']}; line-height:1.1;">{mean_c:,.0f} <span style="font-size:1.1rem; font-weight:600;">mm</span></div>
-              <div style="font-size:0.86rem; color:{T['muted']}; font-weight:600;">Normal Annual Precipitation (1901–2015)</div>
+              <div style="font-size:0.86rem; color:{T['muted']}; font-weight:600;">Normal Annual Precipitation ({span_lo}–{span_hi}{", incl. " + str(n_obs_years) + " observed yrs" if n_obs_years else ""})</div>
             </div>
             <div style="font-size:0.85rem; color:{T['text']}; margin-bottom:0.6rem; font-style:italic;">
               {DIV_DESC.get(CD, "Regional Meteorological Division")}
@@ -2222,15 +2367,19 @@ if CD and CD in df["division"].unique():
 
     # ── TAB 1: ANNUAL TIME SERIES & DECADES ──────────────────────────────────
     with tab_series:
-        st.markdown(f"#### 115-Year Annual Rainfall History — {CD}")
-        st.caption("Each bar represents one year for this place. Color indicates water anomaly: 🟢 Normal/Above (>=90%), 🟡 Mild Deficit (75–90%), 🔴 Severe Deficit (<75%).")
-        
-        # Color coding each bar for this place
+        _span_lbl = f"{span_years}-Year ({span_lo}–{span_hi})"
+        st.markdown(f"#### {_span_lbl} Annual Rainfall History — {CD}")
+        _obs_note = (f" Includes {n_obs_years} observed IMD years (2016–2025, amber-outlined bars)."
+                     if n_obs_years else
+                     " No observed IMD rows for this division's canonical name — pipeline layer only.")
+        st.caption("Each bar represents one year for this place. Color indicates water anomaly: 🟢 Normal/Above (>=90%), 🟡 Mild Deficit (75–90%), 🔴 Severe Deficit (<75%)." + _obs_note)
+
+        # Color coding each bar for this place (observed years get a distinct teal hue)
         bar_colors = [
-            "#16a34a" if v >= mean_c * 0.90 else ("#f59e0b" if v >= mean_c * 0.75 else "#ef4444")
-            for v in ann_c["rainfall_mm"]
+            ("#0d9488" if obs else ("#16a34a" if v >= mean_c * 0.90 else ("#f59e0b" if v >= mean_c * 0.75 else "#ef4444")))
+            for v, obs in zip(ann_c["rainfall_mm"], _is_obs)
         ]
-        
+
         # 10-year rolling smooth for this place
         roll_10 = ann_c["rainfall_mm"].rolling(10, center=True, min_periods=3).mean()
 
@@ -2239,8 +2388,11 @@ if CD and CD in df["division"].unique():
             x=ann_c["year"], y=ann_c["rainfall_mm"],
             marker_color=bar_colors,
             name="Annual Total",
-            customdata=np.round(((ann_c["rainfall_mm"] - mean_c) / mean_c * 100), 1),
-            hovertemplate="<b>%{x}</b>: %{y:,.0f} mm (Anomaly: %{customdata:+.1f}%)<extra></extra>",
+            customdata=np.stack([
+                np.round(((ann_c["rainfall_mm"] - mean_c) / mean_c * 100), 1),
+                np.where(_is_obs, "observed IMD", "pipeline layer"),
+            ], axis=-1),
+            hovertemplate="<b>%{x}</b>: %{y:,.0f} mm (Anomaly: %{customdata[0]:+.1f}%)<br><i>%{customdata[1]}</i><extra></extra>",
             opacity=0.88,
         ))
         fig_ts.add_trace(go.Scatter(
@@ -2257,7 +2409,7 @@ if CD and CD in df["division"].unique():
                          annotation_font_color=_TEXT_COLOR)
         fig_ts.update_layout(
             title=dict(
-                text=f"Annual Rainfall (1901–2015) — {CD}",
+                text=f"Annual Rainfall ({span_lo}–{span_hi}) — {CD}",
                 font=dict(color=_TITLE_COLOR, size=15, family="'Outfit', 'Plus Jakarta Sans', sans-serif"),
             ),
             height=400, **_PAPER,
@@ -2292,7 +2444,7 @@ if CD and CD in df["division"].unique():
             hovertemplate="<b>%{x}</b>: %{y:,.0f} mm/yr (%{customdata:+.1f}% vs normal)<extra></extra>",
         ))
         fig_dec.add_hline(y=mean_c, line_dash="dash", line_color="#475569" if not _DARK else "#94a3b8",
-                          annotation_text=f"115-Yr Mean ({mean_c:,.0f} mm)",
+                          annotation_text=f"{span_years}-Yr Mean ({mean_c:,.0f} mm)",
                           annotation_font_color=_TEXT_COLOR)
         fig_dec.update_layout(
             title=dict(
@@ -2318,6 +2470,8 @@ if CD and CD in df["division"].unique():
     # ── TAB 2: SEASONAL BREAKDOWN ────────────────────────────────────────────
     with tab_seas:
         st.markdown(f"#### Seasonal Moisture Regime — {CD}")
+        st.caption("Monsoon, pre-monsoon and post-monsoon means include observed IMD years (2016–2025). "
+                   "Winter is Dec–Feb in the pipeline layer but Jan–Feb in IMD's observed tables, so winter means use the pipeline record (1901–2015) only — the two are never mixed.")
         col_s1, col_s2 = st.columns([1, 1])
         with col_s1:
             fig_pie = go.Figure(go.Pie(
@@ -2374,9 +2528,9 @@ if CD and CD in df["division"].unique():
         st.markdown(f"##### Climate Shift in {CD}: Compare Two Eras")
         cp1, cp2 = st.columns(2)
         with cp1:
-            per_a = st.slider("Period A (Baseline)", year_min, year_max, (1950, 1980), key=f"pa_{CD}")
+            per_a = st.slider("Period A (Baseline)", span_lo, span_hi, (1950, 1980), key=f"pa_{CD}")
         with cp2:
-            per_b = st.slider("Period B (Recent)", year_min, year_max, (1981, year_max), key=f"pb_{CD}")
+            per_b = st.slider("Period B (Recent)", span_lo, span_hi, (1981, span_hi), key=f"pb_{CD}")
 
         sub_a = ann_c[(ann_c["year"] >= per_a[0]) & (ann_c["year"] <= per_a[1])]["rainfall_mm"]
         sub_b = ann_c[(ann_c["year"] >= per_b[0]) & (ann_c["year"] <= per_b[1])]["rainfall_mm"]
@@ -2512,14 +2666,14 @@ if CD and CD in df["division"].unique():
         <div style="background:{'rgba(34,197,94,0.08)' if _DARK else 'rgba(21,128,61,0.06)'}; border:1px solid {'rgba(34,197,94,0.3)' if _DARK else 'rgba(21,128,61,0.25)'}; border-radius:14px; padding:12px 18px; margin-bottom:1.3rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div>
             <div style="font-weight:800; font-size:0.95rem; color:{'#22c55e' if _DARK else '#15803d'};">
-              📌 Plain Fact Sheet &amp; Observational Conclusions (1901–2015 Record)
+              📌 Plain Fact Sheet &amp; Observational Conclusions ({span_lo}–{span_hi} Record)
             </div>
             <div style="font-size:0.83rem; color:{T['muted']}; margin-top:3px;">
-              <b>No Predictive Models:</b> All takeaways below are empirical facts calculated directly from 115 years of recorded IMD observations for <b>{CD}</b>. Designed for rapid review without analyzing graphs.
+              <b>No Predictive Models:</b> All takeaways below are empirical facts calculated directly from {span_years} years of records for <b>{CD}</b> ({n_years - n_obs_years} pipeline + {n_obs_years} observed IMD). Designed for rapid review without analyzing graphs.
             </div>
           </div>
           <span style="background:{'rgba(34,197,94,0.18)' if _DARK else 'rgba(21,128,61,0.12)'}; color:{'#22c55e' if _DARK else '#15803d'}; border:1px solid {'rgba(34,197,94,0.4)' if _DARK else 'rgba(21,128,61,0.3)'}; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:800; letter-spacing:0.04em;">
-            115-YEAR GROUND TRUTH
+            {span_years}-YEAR GROUND TRUTH
           </span>
         </div>
         """, unsafe_allow_html=True)
@@ -2532,7 +2686,9 @@ if CD and CD in df["division"].unique():
         wettest_dec_val = float(dec_means.max())
         driest_dec_yr = int(dec_means.idxmin())
         driest_dec_val = float(dec_means.min())
-        recent_dec_val = float(dec_means.get(2000, dec_means.iloc[-1]))
+        recent_dec = 2000 if 2000 in dec_means.index else int(dec_means.index[-1])
+        recent_dec_val = float(dec_means.loc[recent_dec])
+        recent_dec_lo, recent_dec_hi = recent_dec, min(recent_dec + 9, span_hi)
         recent_diff_pct = ((recent_dec_val - mean_c) / mean_c * 100) if mean_c else 0
 
         # Stability categorization
@@ -2676,9 +2832,9 @@ if CD and CD in df["division"].unique():
               <div class="fact-quad-metric">{slope_c:+.2f} mm/yr</div>
               <div class="fact-quad-body">
                 <ul>
-                  <li><b>115-Yr OLS Slope:</b> {slope_c:+.2f} mm per calendar year.</li>
+                  <li><b>{span_years}-Yr OLS Slope:</b> {slope_c:+.2f} mm per calendar year.</li>
                   <li><b>Statistical Significance:</b> p = <b>{p_c:.4f}</b> {'(&lt; 0.05 significant)' if p_c < 0.05 else '(&ge; 0.05 not significant)'}.</li>
-                  <li><b>Net Historical Shift:</b> <b>{slope_c*115:+.0f} mm</b> across the 1901–2015 observation window.</li>
+                  <li><b>Net Historical Shift:</b> <b>{slope_c*span_years:+.0f} mm</b> across the {span_lo}–{span_hi} observation window.</li>
                   <li><b>Observation only:</b> Represents historical ledger; no future trajectory is implied.</li>
                 </ul>
               </div>
@@ -2697,7 +2853,7 @@ if CD and CD in df["division"].unique():
                 <ul>
                   <li><b>Wettest Decade:</b> {wettest_dec_yr}s averaged <b>{wettest_dec_val:,.0f} mm/yr</b> ({((wettest_dec_val-mean_c)/mean_c*100):+.1f}% vs normal).</li>
                   <li><b>Driest Decade:</b> {driest_dec_yr}s averaged <b>{driest_dec_val:,.0f} mm/yr</b> ({((driest_dec_val-mean_c)/mean_c*100):+.1f}% vs normal).</li>
-                  <li><b>Recent Era (2000s–2015):</b> Averaged <b>{recent_dec_val:,.0f} mm/yr</b> ({recent_diff_pct:+.1f}% vs baseline).</li>
+                  <li><b>Recent Era ({recent_dec_lo}–{recent_dec_hi}):</b> Averaged <b>{recent_dec_val:,.0f} mm/yr</b> ({recent_diff_pct:+.1f}% vs baseline).</li>
                   <li>Documents multi-decadal oscillation without making forward predictions.</li>
                 </ul>
               </div>
@@ -2749,12 +2905,28 @@ def render_all_states_comparison():
           </h2>
           <p class="sect-sub" style="margin:0; font-size:0.88rem;">
             Pan-India cross-division rankings, drought vulnerability classification, and national long-term trends across all 36 subdivisions.
+            <b>Record: 1901–2025</b> — pipeline layer (1901–2015) + observed IMD annual values (2016–2025; 2020 quality-gated).
           </p>
         </div>
       </div>
     ''').strip(), unsafe_allow_html=True)
 
     annual_all = df[df["season"] == "ANNUAL"]
+    # Extend rankings with observed IMD annual values (2016–2025) per division.
+    if year_range[1] > 2015:
+        _obs_rank_frames = []
+        for _pd_name in annual_all["division"].unique():
+            _cn = PIPE_TO_CANON.get(_pd_name)
+            if _cn:
+                _o = observed_rows_for_division(_cn)
+                if not _o.empty:
+                    _o = _o[(_o["season"] == "ANNUAL")
+                            & (_o["year"] >= year_range[0]) & (_o["year"] <= year_range[1])].copy()
+                    _o["division"] = _pd_name
+                    _obs_rank_frames.append(_o)
+        if _obs_rank_frames:
+            annual_all = pd.concat(
+                [annual_all, pd.concat(_obs_rank_frames, ignore_index=True)], ignore_index=True)
     rank = annual_all.groupby("division")["rainfall_mm"].agg(["mean", "std"]).reset_index()
     rank["cv"] = rank["std"] / rank["mean"] * 100
     rank = rank.sort_values("cv", ascending=True)
@@ -2803,31 +2975,52 @@ def render_all_states_comparison():
     st.markdown(f"<p style='font-size:0.84rem;color:{T['muted']};margin-bottom:0.8rem;'>Categorized via India Meteorological Department (IMD) recurrence standards &amp; interannual variability (CV%). <b>🟢 Low Risk:</b> High hydrological stability (CV &lt; 23% and drought &lt; 15% yrs). <b>🟡 Medium Risk:</b> Intermediate variability &amp; periodic deficits. <b>🔴 High Risk:</b> Arid rain-shadow belts &amp; chronic drought recurrence (CV &ge; 35% or drought &ge; 25% yrs).</p>", unsafe_allow_html=True)
     st.markdown(render_risk_table(df_risk, _DARK), unsafe_allow_html=True)
 
-    # All-India National Trend
+    # All-India National Trend — pipeline layer (1901–2015, blue) + observed IMD
+    # (2016–2025, amber). The two layers have slightly different calibrations, so
+    # they are plotted as distinct series, never silently merged into one line.
     nat = yearly_national.copy()
     nat["year"] = nat["year"].astype(int)
+    nat_ext = load_national_extended()
+    nat_obs = nat_ext[nat_ext["layer"] == "observed IMD"]
     fig6 = go.Figure()
     fig6.add_trace(go.Bar(
         x=nat["year"], y=nat["national_annual_mean"],
         marker_color=np.where(nat["national_annual_mean"] < nat["national_annual_mean"].mean() * 0.9,
                               "#ef4444", "#3b82f6"),
-        opacity=0.75, name="Annual mean",
-        hovertemplate="%{x}: %{y:,.0f} mm<extra></extra>",
+        opacity=0.75, name="Annual mean (pipeline 1901–2015)",
+        hovertemplate="<b>%{x}</b>: %{y:,.0f} mm<extra>pipeline layer</extra>",
     ))
+    if not nat_obs.empty:
+        fig6.add_trace(go.Bar(
+            x=nat_obs["year"], y=nat_obs["mm"],
+            marker_color="#f59e0b", opacity=0.9,
+            name="Observed IMD (2016–2025)",
+            hovertemplate="<b>%{x}</b>: %{y:,.0f} mm<extra>observed IMD</extra>",
+        ))
+    _mon26 = nat_ext[(nat_ext["year"] == 2026) & nat_ext["monsoon_mm"].notna()]
+    if not _mon26.empty:
+        fig6.add_annotation(
+            x=2026, y=_mon26["monsoon_mm"].iloc[0],
+            text=f"2026: monsoon {_mon26['monsoon_mm'].iloc[0]:,.0f} mm "
+                 f"({_mon26['monsoon_dep'].iloc[0]:+.1f}%) — year in progress",
+            showarrow=True, arrowhead=2, arrowcolor="#ef4444",
+            font=dict(color=_TEXT_COLOR, size=11),
+            ay=-60,
+        )
     fig6.add_trace(go.Scatter(
         x=nat["year"], y=nat["national_annual_mean"].rolling(10, center=True, min_periods=3).mean(),
-        mode="lines", name="10-yr smooth", line=dict(color="#f59e0b" if not _DARK else "#fbbf24", width=3),
+        mode="lines", name="10-yr smooth (pipeline)", line=dict(color="#f59e0b" if not _DARK else "#fbbf24", width=3),
     ))
     mean_all = nat["national_annual_mean"].mean()
     fig6.add_hline(y=mean_all, line_dash="dash", line_color="#475569" if not _DARK else "#94a3b8",
-                   annotation_text=f"1901–2015 mean {mean_all:,.0f} mm",
+                   annotation_text=f"Pipeline 1901–2015 mean {mean_all:,.0f} mm",
                    annotation_font_color=_TEXT_COLOR)
     fig6.add_hline(y=mean_all * 0.9, line_dash="dot", line_color="#dc2626" if not _DARK else "#ef4444",
                    annotation_text="90% of normal (dry threshold)",
                    annotation_font_color=_TEXT_COLOR)
     fig6.update_layout(
         title=dict(
-            text="All-India mean annual rainfall — red bars fall below 90% of normal",
+            text="All-India annual rainfall 1901–2026 — blue: pipeline (1901–2015) · amber: observed IMD (2016–2025) · red bars below 90%",
             font=dict(color=_TITLE_COLOR, size=15, family="'Outfit', 'Plus Jakarta Sans', sans-serif"),
         ),
         height=400, **_PAPER,
@@ -2898,7 +3091,7 @@ else:
 st.markdown("""
 <div class="foot">
   <b style="color:#94a3b8">VARSA</b> · Variability, Anomalies and Regional Statistics of Indian Rainfall<br>
-  Data: India Meteorological Department (IMD) via Open Government Data · 1901–2015 · 36 subdivisions<br>
+  Data: India Meteorological Department (IMD) · pipeline layer 1901–2015 + observed IMD 2016–2026 · 36 subdivisions<br>
   Probability &amp; Statistics (BAMAT207) · Dr. Juhi Baroi · Pratik 25BCE0337 · Adarsh 25BCE0401 · Arunya 25BCE0344
 </div>
 """, unsafe_allow_html=True)
