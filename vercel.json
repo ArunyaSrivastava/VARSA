@@ -1,18 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "site",
   "cleanUrls": true,
-  "rewrites": [
-    { "source": "/", "destination": "/site/index.html" },
-    { "source": "/assets/(.*)", "destination": "/site/assets/$1" },
-    { "source": "/data/(.*)", "destination": "/site/data/$1" }
-  ],
   "headers": [
     {
-      "source": "/site/data/(.*)",
+      "source": "/data/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
     },
     {
-      "source": "/site/assets/(.*)",
+      "source": "/assets/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
     }
   ]
