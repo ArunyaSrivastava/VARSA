@@ -22,6 +22,10 @@ ENV/
 # ==========================================
 data/raw/*
 !data/raw/india_rainfall.csv
+!data/raw/imd_observed_subdivisions.csv
+!data/raw/imd_all_india_monthly.csv
+!data/raw/imd_all_india_monsoon.csv
+data/cache/
 data/processed/
 data/wesad/
 *.pkl

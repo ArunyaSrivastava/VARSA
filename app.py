@@ -758,6 +758,153 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_PATH = BASE_DIR / "data" / "raw" / "india_rainfall.csv"
 GEOJSON_PATH = BASE_DIR / "data" / "geo" / "india_boundary.geojson"
 
+# ── Unified data service: pipeline layer (1901-2015) + observed IMD (2015-2026) ──
+GEO_SUBDIVISIONS = BASE_DIR / "data" / "geo" / "imd_subdivisions.geojson"
+OBS_SUBDIVISIONS = BASE_DIR / "data" / "raw" / "imd_observed_subdivisions.csv"
+OBS_NATIONAL_MONSOON = BASE_DIR / "data" / "raw" / "imd_all_india_monsoon.csv"
+OBS_NATIONAL_MONTHLY = BASE_DIR / "data" / "raw" / "imd_all_india_monthly.csv"
+
+# season label -> (pipeline-layer season, observed-layer season)
+PRISM_SEASONS = {
+    "Monsoon (Jun–Sep)": ("JAS", "MONSOON"),
+    "Annual": ("ANNUAL", "ANNUAL"),
+    "Winter": ("DJF", "WINTER"),
+    "Pre-monsoon (Mar–May)": ("MAM", "PREMONSOON"),
+    "Post-monsoon (Oct–Dec)": ("OND", "POSTMONSOON"),
+}
+
+
+@st.cache_data(show_spinner=False)
+def load_unified_subdivisions() -> pd.DataFrame:
+    """Pipeline layer (generated, 1901-2015) + observed IMD subdivisions
+    (2015-2025). Observed values win for overlapping 2015. Returns
+    (year, division, season, actual_mm, pct_dep, layer)."""
+    frames = []
+    pipe = load_data()
+    div_map = {}  # pipeline division name -> observed canonical name (approximate)
+    for p_name, o_name in [
+        ("Orissa", "ODISHA"), ("Coastal Odisha", "ODISHA"),
+        ("Uttarakhand", "UTTARAKHAND"), ("Uttaranchal", "UTTARAKHAND"),
+        ("Gangetic West Bengal", "GANGETIC W.B."), ("Sub-Montane West Bengal", "SUB-HIMALAYAN W.B. & SIKKIM"),
+        ("Sikkim", "SUB-HIMALAYAN W.B. & SIKKIM"), ("Jammu & Kashmir", "JAMMU & KASHMIR"),
+        ("Ladakh", "JAMMU & KASHMIR"), ("Cold Desert (HP & UK)", "HIMACHAL PRADESH"),
+        ("Haryana, Delhi & Chandigarh", "HARYANA-CHD-DELHI"),
+        ("East Uttar Pradesh", "EAST U.P."), ("West Uttar Pradesh", "WEST U.P."),
+        ("North West Uttar Pradesh", "WEST U.P."),
+        ("East Rajasthan", "EAST RAJASTHAN"), ("West Rajasthan", "WEST RAJASTHAN"),
+        ("Madhya Bharat", "WEST M.P."), ("Madhya Maharashtra", "MADHYA MAHARASHTRA"),
+        ("Chhattisgarh", "CHHATTISGARH"), ("Bihar", "BIHAR"), ("Jharkhand", "JHARKHAND"),
+        ("Coast Andhra Pradesh", "COASTAL A.P."), ("Coastal Andhra Pradesh & Yanam", "COASTAL A.P."),
+        ("Telangana", "TELANGANA"), ("Rayalaseema", "RAYALASEEMA"), ("Tamil Nadu", "TAMIL NADU"),
+        ("Coastal Karnataka", "COASTAL KARNATAKA"),
+        ("North Interior Karnataka", "NORTH INTERIOR KARNATAKA"),
+        ("South Interior Karnataka", "SOUTH INTERIOR KARNATAKA"),
+        ("Kerala", "KERALA"), ("Lakshadweep", "LAKSHADWEEP"),
+        ("Arunachal Pradesh", "ARUNACHAL PRADESH"),
+        ("Assam & Meghalaya", "ASSAM & MEGHALAYA"),
+        ("Himachal Pradesh", "HIMACHAL PRADESH"), ("Punjab", "PUNJAB"),
+        ("Gujarat Region", "GUJARAT REGION"), ("Konkan & Goa", "KONKAN & GOA"),
+        ("Vidarbha", "VIDARBHA"), ("Marathwada", "MARATHAWADA"),
+    ]:
+        div_map[p_name] = o_name
+    for season_label, (p_season, _o) in PRISM_SEASONS.items():
+        q = pipe[pipe["season"] == p_season][["year", "division", "rainfall_mm"]]
+        q = q.assign(season=season_label, pct_dep=np.nan, layer="pipeline (generated)")
+        frames.append(q)
+    unified = pd.concat(frames, ignore_index=True)
+    unified["division"] = unified["division"].map(lambda d: div_map.get(d, d.upper()))
+
+    if OBS_SUBDIVISIONS.exists():
+        obs = pd.read_csv(OBS_SUBDIVISIONS)
+        obs = obs.rename(columns={"actual_mm": "rainfall_mm"})
+        obs["layer"] = "observed IMD"
+        obs = obs[obs["year"] > 2015]  # 2015 kept from pipeline for continuity; observed kept in its own file
+        # re-key observed seasons to display labels
+        inv = {o: label for label, (_p, o) in PRISM_SEASONS.items()}
+        obs["season"] = obs["season"].map(inv)
+        unified = pd.concat([unified[unified["year"] <= 2015], obs], ignore_index=True)
+    # several pipeline divisions map onto one IMD subdivision (e.g. J&K + Ladakh,
+    # Sikkim + Sub-Himalayan WB): aggregate to the canonical division mean
+    unified = unified.groupby(["year", "division", "season"], as_index=False).agg(
+        rainfall_mm=("rainfall_mm", "mean"),
+        pct_dep=("pct_dep", "mean"),
+        layer=("layer", "first"),
+    )
+    return unified.rename(columns={"rainfall_mm": "actual_mm"})
+
+
+@st.cache_data(show_spinner=False)
+def load_national_2026() -> dict | None:
+    """Latest observed all-India monsoon numbers (2026 in progress)."""
+    if not OBS_NATIONAL_MONSOON.exists():
+        return None
+    m = pd.read_csv(OBS_NATIONAL_MONSOON)
+    row = m[(m["region"] == "ALL INDIA") & (m["year"] == m["year"].max())]
+    if row.empty:
+        return None
+    r = row.iloc[0]
+    return {"year": int(r["year"]), "mm": float(r["jun_sep"]),
+            "dep": float(r["jun_sep_dep"])}
+
+
+def _dep_color(dep: float) -> list:
+    """%departure -> RGB for the prism map."""
+    if dep is None or (isinstance(dep, float) and np.isnan(dep)):
+        return [120, 130, 145]
+    if dep >= 20:
+        return [29, 78, 216]     # blue: large excess
+    if dep >= 0:
+        return [34, 197, 94]     # green: normal/excess
+    if dep >= -20:
+        return [234, 179, 8]     # amber: deficit
+    if dep >= -40:
+        return [249, 115, 22]    # orange: moderate deficit
+    return [220, 38, 38]         # red: severe deficit
+
+
+@st.cache_data(show_spinner=False)
+def prism_frame(season_label: str, year: int):
+    """(geojson polygons joined with values, stats) for the prism view."""
+    import json as _json
+    if not GEO_SUBDIVISIONS.exists():
+        return None, None
+    geo = _json.loads(GEO_SUBDIVISIONS.read_text(encoding="utf-8"))
+    uni = load_unified_subdivisions()
+    sel = uni[(uni["season"] == season_label) & (uni["year"] == year)]
+    # for pipeline years colour by % anomaly vs the division's long-run mean
+    if year <= 2015:
+        base = uni[(uni["season"] == season_label) & (uni["year"] <= 2015)]
+        means = base.groupby("division")["actual_mm"].mean()
+        sel = sel.set_index("division")
+        sel["pct_dep"] = 100 * (sel["actual_mm"] - means) / means
+        sel = sel.reset_index()
+    rows = sel.set_index("division")
+    feats = []
+    for f in geo["features"]:
+        d = f["properties"]["division"]
+        g = f["geometry"]
+        if g["type"] == "Polygon":
+            rings = [g["coordinates"]]
+        else:
+            rings = [p for p in g["coordinates"] if p and len(p[0]) >= 4]
+        for ring in rings:
+            rec = {"name": d, "region": f["properties"]["region"],
+                   "polygon": [[pt[0], pt[1]] for pt in ring[0]]}
+            if d in rows.index:
+                r = rows.loc[d]
+                if hasattr(r, "item"):
+                    r = rows.loc[[d]].iloc[0]
+                rec["mm"] = float(r["actual_mm"]) if pd.notna(r["actual_mm"]) else 0.0
+                rec["dep"] = float(r["pct_dep"]) if pd.notna(r["pct_dep"]) else None
+                rec["layer"] = str(r["layer"])
+            else:
+                rec["mm"], rec["dep"], rec["layer"] = 0.0, None, "no data"
+            rec["color"] = _dep_color(rec["dep"]) + [185]
+            feats.append(rec)
+    return feats, rows
+
+
+
 @st.cache_data
 def load_data():
     df = pd.read_csv(DATA_PATH)
@@ -967,6 +1114,30 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ── Live observed-monsoon banner (2026 in progress) ──────────────────────────
+_nat26 = load_national_2026()
+if _nat26:
+    _dep_color_ = "#dc2626" if _nat26["dep"] <= -10 else ("#d97706" if _nat26["dep"] < 0 else "#15803d")
+    st.markdown(f"""
+    <div style="display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,
+      rgba(220,38,38,0.12), rgba(11,20,40,0));border:1.5px solid {_dep_color_}55;
+      border-left:6px solid {_dep_color_};border-radius:14px;padding:12px 18px;margin:10px 0 4px;">
+      <div style="font-size:1.5rem;animation:varsa-pulse 2.2s ease-in-out infinite;">🌧️</div>
+      <div style="flex:1;">
+        <b style="color:{_dep_color_};font-size:0.98rem;">
+          {_nat26['year']} monsoon in progress — {_nat26['mm']:,.0f} mm Jun–Sep
+          ({_nat26['dep']:+.1f}% of normal)
+        </b>
+        <div style="font-size:0.78rem;color:{T['muted']};">
+          Observed IMD data (CMPG), extends the dashboard to 2026 · refresh via
+          <code>python scripts/data/fetch_observed.py</code>
+        </div>
+      </div>
+      <div class="badge blue" style="white-space:nowrap;">observed · live</div>
+    </div>
+    <style>@keyframes varsa-pulse{{0%,100%{{opacity:1}}50%{{opacity:0.45}}}}</style>
+    """, unsafe_allow_html=True)
+
 # ════════════════════════════════════════════════════════════════════════════
 # SECTION 1 — INTERACTIVE INDIA RAINFALL & PHYSICAL TERRAIN MAP  (highest priority)
 # ════════════════════════════════════════════════════════════════════════════
@@ -976,10 +1147,12 @@ st.markdown('<p class="sect-sub"><b>India in vibrant green</b>, physical mountai
 
 # ── Style switcher (Ultra-Fast 60-FPS WebGL Hardware Map, 3D Sculpted Model, 3D Globe) ──
 MAP_STYLE_WEBGL = "⚡ 60-FPS WebGL Hardware Map (Ultra-Fast & Responsive)"
+MAP_STYLE_PRISM = "🏗️ 3D Rainfall-Height Atlas (1901–2026)"
 MAP_STYLE_SKETCHFAB = "🗿 3D Sculpted India Model (Blender / Sketchfab 3D)"
 MAP_STYLE_GLOBE = "🌍 3D Interactive Globe"
 
-ALL_MAP_STYLES = [MAP_STYLE_WEBGL, MAP_STYLE_SKETCHFAB, MAP_STYLE_GLOBE]
+ALL_MAP_STYLES = [MAP_STYLE_WEBGL, MAP_STYLE_PRISM, MAP_STYLE_SKETCHFAB, MAP_STYLE_GLOBE]
+
 
 map_style = st.radio(
     "Map style",
@@ -1035,6 +1208,50 @@ elif map_style == MAP_STYLE_SKETCHFAB:
     </div>
     """, unsafe_allow_html=True)
     st.caption("💡 **3D Controls:** Left-click + drag to rotate 360°. Right-click or two-finger drag to pan. Scroll wheel to zoom in/out.")
+    terrain_focus = "🇮🇳 All India (Subcontinent Overview)"
+    show_network = False
+elif map_style == MAP_STYLE_PRISM:
+    import streamlit.components.v1 as _components_prism
+    c_pa, c_pb, c_pc = st.columns([1.35, 1.35, 1.3])
+    with c_pa:
+        prism_season = st.radio(
+            "Season",
+            list(PRISM_SEASONS.keys()),
+            index=0,
+            horizontal=True,
+            key="prism_season",
+            label_visibility="collapsed",
+        )
+    with c_pb:
+        prism_year = st.slider(
+            "Year", 1901, 2026, 2025, 1, key="prism_year",
+            help="1901–2015: pipeline layer (generated, IMD-calibrated). 2016–2025: observed IMD Annual Climate Summary values. 2026: national monsoon only so far.",
+        )
+    with c_pc:
+        prism_place = st.selectbox(
+            "Open dossier for…",
+            ["— pick a subdivision —"] + sorted(load_unified_subdivisions()["division"].unique()),
+            key="prism_place",
+            on_change=lambda: (
+                setattr(st.session_state, "clicked_div",
+                        st.session_state.get("prism_place")
+                        if st.session_state.get("prism_place") != "— pick a subdivision —"
+                        else st.session_state.get("clicked_div")),
+            ),
+        )
+    st.markdown(
+        "<div style='font-size:0.78rem; line-height:1.5;'>Colour = % departure from normal: "
+        "<span style='color:#1d4ed8'><b>■</b> +20%+</span> "
+        "<span style='color:#22c55e'><b>■</b> normal/excess</span> "
+        "<span style='color:#eab308'><b>■</b> −20–0%</span> "
+        "<span style='color:#f97316'><b>■</b> −40–−20%</span> "
+        "<span style='color:#dc2626'><b>■</b> −40% or worse</span> · "
+        "<span style='color:#788291'><b>■</b> no data</span> (the generated 1901–2015 layer "
+        "omits 5 official subdivisions; 2020's table is unverifiable; 2026 is national-only) · "
+        "Height = seasonal rainfall (mm). Winter definitions differ slightly between layers "
+        "(pipeline Dec–Feb, observed Jan–Feb).</div>",
+        unsafe_allow_html=True,
+    )
     terrain_focus = "🇮🇳 All India (Subcontinent Overview)"
     show_network = False
 else:  # MAP_STYLE_GLOBE
@@ -1546,6 +1763,45 @@ if map_style == MAP_STYLE_WEBGL:
         theme=None,
     )
     _picked = _capture(ev)
+elif map_style == MAP_STYLE_PRISM:
+    import pydeck as pdk
+    feats, _rows = prism_frame(prism_season, prism_year)
+    if feats is None:
+        st.info("Subdivision boundaries not built yet — run: "
+                "`python scripts/data/build_subdivision_geo.py`")
+    else:
+        layer = pdk.Layer(
+            "PolygonLayer",
+            feats,
+            get_polygon="polygon",
+            get_elevation="mm",
+            elevation_scale=0.55,
+            extruded=True,
+            get_fill_color="color",
+            get_line_color=[10, 16, 28],
+            line_width_min_pixels=1,
+            pickable=True,
+            auto_highlight=True,
+        )
+        view = pdk.ViewState(latitude=22.6, longitude=79.6, zoom=3.85,
+                             pitch=54, bearing=-14, max_zoom=9)
+        deck = pdk.Deck(
+            layers=[layer],
+            initial_view_state=view,
+            map_provider=None,
+            tooltip={
+                "html": ("<b>{name}</b><br/>{mm:,.0f} mm"
+                         "<br/>% dep: {dep}<br/><i>{layer}</i>"),
+                "style": {"background": "rgba(11,20,40,0.9)", "color": "#E8EEF7",
+                          "font-family": "Outfit, sans-serif", "border-radius": "8px"},
+            },
+        )
+        st.pydeck_chart(deck, use_container_width=True, key="india_prism_map", height=620)
+        nat26 = load_national_2026()
+        if prism_year == 2026 and nat26:
+            st.info(f"2026 subdivision values are not published yet — all-India "
+                    f"monsoon so far: **{nat26['mm']:,.0f} mm ({nat26['dep']:+.1f}% of normal)** "
+                    f"(observed IMD, updates with every data refresh).")
 elif map_style == MAP_STYLE_SKETCHFAB:
     import streamlit.components.v1 as components
     st.markdown(f"""

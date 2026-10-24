@@ -1,0 +1,103 @@
+VARSA — observed post-2015 IMD data fetch
+============================================================
+
+=== ANNUAL CLIMATE SUMMARIES (subdivision tables) ===
+[2015] page 23 (transposed/mirrored): 36 divisions, 180 cells
+[2016] page 25 (transposed/mirrored): 36 divisions, 180 cells
+[2017] page 27 (transposed/mirrored): 36 divisions, 180 cells
+[2018] page 27 (transposed/mirrored): 36 divisions, 180 cells
+[2019] page 27 (transposed/mirrored): 36 divisions, 180 cells
+[2020] structured parse incomplete (0 divisions) -> word reconstruction
+[2020] page None (word-reconstruction): 36 divisions, 180 cells
+[2021] page 22 (transposed/mirrored): 36 divisions, 180 cells
+[2022] page 30 (normal): 36 divisions, 180 cells
+[2023] page 33 (normal): 36 divisions, 180 cells
+[2024] page 34 (normal): 36 divisions, 180 cells
+[2025] page 32 (normal): 36 divisions, 180 cells
+
+=== VALIDATION ===
+cells with act+norm+dep: 1932
+cells failing the scale-aware departure check: 17
+year  season     
+2020  ANNUAL         4
+      MONSOON        2
+      POSTMONSOON    4
+      PREMONSOON     4
+      WINTER         3
+
+season-sum vs annual (worst 5, % difference):
+year  division                     
+2020  A & N ISLANDS                    70.35
+2025  NAGALAND-MANIPUR-MIZO-TRIPURA     2.07
+2022  ASSAM & MEGHALAYA                 2.02
+      ARUNACHAL PRADESH                 1.78
+2023  GUJARAT REGION                    1.05
+rows within 2%: 99.2%
+
+divisions per year:
+year
+2015    36
+2016    36
+2017    36
+2018    36
+2019    36
+2020    36
+2021    36
+2022    36
+2023    36
+2024    36
+2025    36
+
+dropped 17 inconsistent cells
+
+[gate] year 2020 REJECTED and excluded (163 cells): 9.4% of cells fail the departure check
+       (national/region series for 2020 remain available from the CMPG HTML sources)
+
+wrote data/raw/imd_observed_subdivisions.csv (1800 rows)
+  years: [np.int64(2015), np.int64(2016), np.int64(2017), np.int64(2018), np.int64(2019), np.int64(2021), np.int64(2022), np.int64(2023), np.int64(2024), np.int64(2025)]
+  divisions: 36
+
+=== CMPG homo.html (all-India monthly) ===
+wrote data/raw/imd_all_india_monthly.csv (8170 rows, 1901-2026)
+
+=== CMPG Rainfall_Data.html (monsoon months) ===
+wrote data/raw/imd_all_india_monsoon.csv (630 rows, 1901-2026)
+
+=== CROSS-SOURCE CHECKS ===
+All-India annual (homo.html), 2016-2026:
+ year    region  month  rainfall_mm
+ 2016 ALL INDIA ANNUAL       1083.6
+ 2017 ALL INDIA ANNUAL       1126.4
+ 2018 ALL INDIA ANNUAL       1005.9
+ 2019 ALL INDIA ANNUAL       1286.0
+ 2020 ALL INDIA ANNUAL       1283.3
+ 2021 ALL INDIA ANNUAL       1233.7
+ 2022 ALL INDIA ANNUAL       1257.6
+ 2023 ALL INDIA ANNUAL       1103.2
+ 2024 ALL INDIA ANNUAL       1206.6
+ 2025 ALL INDIA ANNUAL       1278.1
+
+All-India Jun-Sep (Rainfall_Data.html), 2016-2026:
+ year   jun   jul   aug   sep  jun_sep  jun_sep_dep
+ 2016 147.6 308.4 239.7 169.8    865.5         -0.3
+ 2017 172.7 290.3 229.5 153.2    845.7         -2.6
+ 2018 156.3 274.2 241.0 132.5    804.0         -7.4
+ 2019 113.6 297.0 299.9 260.2    970.8         11.8
+ 2020 195.8 257.1 328.2 178.2    959.3         10.5
+ 2021 182.3 266.3 194.3 229.3    872.3          0.4
+ 2022 152.3 327.7 263.7 181.3    925.0          6.5
+ 2023 152.9 316.5 162.9 189.9    822.3         -5.3
+ 2024 147.3 304.6 293.5 187.7    935.9          7.8
+ 2025 180.2 294.1 267.8 193.6    936.8          7.8
+ 2026 106.8 283.3 213.3 155.1    759.4        -12.6
+  2016: homo sum 865.5 vs monsoon page 865.5 -> OK
+  2017: homo sum 845.7 vs monsoon page 845.7 -> OK
+  2018: homo sum 804.0 vs monsoon page 804.0 -> OK
+  2019: homo sum 970.7 vs monsoon page 970.8 -> OK
+  2020: homo sum 959.3 vs monsoon page 959.3 -> OK
+  2021: homo sum 872.2 vs monsoon page 872.3 -> OK
+  2022: homo sum 924.8 vs monsoon page 925.0 -> OK
+  2023: homo sum 822.2 vs monsoon page 822.3 -> OK
+  2024: homo sum 933.1 vs monsoon page 935.9 -> MISMATCH (2.8 mm)
+  2025: homo sum 935.7 vs monsoon page 936.8 -> MISMATCH (1.1 mm)
+  2026: homo sum 758.5 vs monsoon page 759.4 -> OK

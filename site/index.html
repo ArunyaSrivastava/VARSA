@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VARSA — Variability, Anomalies and Regional Statistics of Indian Rainfall</title>
+<meta name="description" content="Interactive 3D atlas of Indian monsoon rainfall, 1901–2026, built on observed IMD subdivision data.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B1428'/%3E%3Cpath d='M8 9l8 14 8-14' stroke='%23E0A526' stroke-width='3.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://unpkg.com/deck.gl@9.1.5/dist.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand">
+      <span class="kicker">PROBABILITY &amp; STATISTICS · BAMAT207</span>
+      <h1>VARSA</h1>
+      <p class="tagline">Variability, Anomalies and Regional Statistics of Indian Rainfall</p>
+      <p class="sub">36 IMD subdivisions · 1901–2026 · observed data + validated pipeline</p>
+    </div>
+    <div class="badges">
+      <span class="badge amber">observed IMD · CMPG</span>
+      <span class="badge blue">3D prism atlas</span>
+      <span class="badge">every number reproducible</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="live-banner" class="banner" hidden>
+    <span class="banner-icon">🌧️</span>
+    <div class="banner-text">
+      <b id="banner-title"></b>
+      <div class="banner-sub">Observed IMD data (CMPG) · the map, chart and banner update with every data refresh</div>
+    </div>
+    <span class="badge blue">observed · live</span>
+  </div>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>🏗️ The subcontinent as a bar chart of itself</h2>
+      <p>Every IMD subdivision extruded to its seasonal rainfall — <b>height&nbsp;=&nbsp;mm</b>,
+         <b>colour&nbsp;=&nbsp;% departure from normal</b>. 2016–2025 uses observed IMD values;
+         1901–2015 the validated pipeline layer (anomaly vs long-run mean).</p>
+    </div>
+    <div class="controls">
+      <div class="pills" id="season-pills"></div>
+      <div class="year-row">
+        <button id="play-btn" title="Replay 125 years">▶</button>
+        <input type="range" id="year-slider" min="1901" max="2026" value="2025">
+        <span class="year-readout" id="year-readout">2025</span>
+      </div>
+      <div class="legend">
+        <span class="sw" style="--c:#1d4ed8"></span>+20%+
+        <span class="sw" style="--c:#22c55e"></span>normal / excess
+        <span class="sw" style="--c:#eab308"></span>−20–0%
+        <span class="sw" style="--c:#f97316"></span>−40–−20%
+        <span class="sw" style="--c:#dc2626"></span>−40% or worse
+        <span class="sw" style="--c:#788291"></span>no data
+        <span class="hint">drag to pan · ctrl+drag to tilt &amp; rotate · scroll to zoom</span>
+      </div>
+    </div>
+    <div id="map-frame"><canvas id="deck-canvas"></canvas>
+      <div id="map-note" class="map-note" hidden></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head row">
+      <h2>125 years, one chart</h2>
+      <div class="pills small" id="series-pills"></div>
+    </div>
+    <div id="national-chart"></div>
+    <p class="caption" id="series-caption"></p>
+  </section>
+
+  <footer>
+    <p><b>VARSA</b> — Pratik (25BCE0337) · Adarsh (25BCE0401) · Arunya (25BCE0344) ·
+       guide: Dr. Juhi Baroi · Probability &amp; Statistics (BAMAT207)</p>
+    <p>Data: IMD Climate Research &amp; Services Pune (Annual Climate Summaries 2015–2025;
+       CMPG monthly/monsoon tables 1901–2026) + IMD-calibrated pipeline layer for 1901–2015.
+       The 2020 subdivision table is excluded (fails machine validation); 2026 subdivision
+       values are not yet published.</p>
+    <p class="fine">This is the static Vercel edition of the VARSA Streamlit dashboard —
+       full statistical dossier, trend tests and distribution fits live in the repo.</p>
+  </footer>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
