@@ -1,0 +1,94 @@
+{
+  "national": {
+    "mean_1901_2015": 1179.7,
+    "mean_2016_2025": 1186.4,
+    "trend_1901_2025_mm_per_century": -18.0,
+    "trend_1901_2025_p": 0.502,
+    "trend_1901_2015_mm_per_century": -27.3,
+    "trend_1901_2015_p": 0.375,
+    "mk_tau_1901_2025": -0.028,
+    "mk_p_1901_2025": 0.646,
+    "monsoon_2026_mm": 759.4,
+    "monsoon_2026_dep": -12.6,
+    "wettest_recent_year": 2019,
+    "wettest_recent_mm": 1286.0,
+    "driest_recent_year": 2018,
+    "driest_recent_mm": 1005.9
+  },
+  "subdivisions": {
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "divisions": 36,
+    "mean_monsoon_dep_by_year": {
+      "2015": -15.1,
+      "2016": -4.6,
+      "2017": -1.9,
+      "2018": -10.4,
+      "2019": 10.2,
+      "2021": 3.5,
+      "2022": 9.4,
+      "2023": -2.8,
+      "2024": 10.6,
+      "2025": 12.7
+    },
+    "extremes": [
+      {
+        "year": 2016,
+        "wettest": "EAST RAJASTHAN (+32%)",
+        "driest": "KERALA (-34%)"
+      },
+      {
+        "year": 2019,
+        "wettest": "SAURASHTRA & KUTCH (+66%)",
+        "driest": "HARYANA-CHD-DELHI (-42%)"
+      },
+      {
+        "year": 2021,
+        "wettest": "MARATHAWADA (+48%)",
+        "driest": "NAGALAND-MANIPUR-MIZO-TRIPURA (-32%)"
+      },
+      {
+        "year": 2022,
+        "wettest": "WEST RAJASTHAN (+58%)",
+        "driest": "BIHAR (-31%)"
+      },
+      {
+        "year": 2023,
+        "wettest": "A & N ISLANDS (+55%)",
+        "driest": "KERALA (-34%)"
+      },
+      {
+        "year": 2024,
+        "wettest": "SAURASHTRA & KUTCH (+75%)",
+        "driest": "PUNJAB (-28%)"
+      },
+      {
+        "year": 2025,
+        "wettest": "WEST RAJASTHAN (+69%)",
+        "driest": "ARUNACHAL PRADESH (-42%)"
+      }
+    ],
+    "kerala_2023_dep": -34.0
+  },
+  "comparison": {
+    "annual_2016_2025_mean": 1186.4,
+    "annual_1901_2015_mean": 1179.7,
+    "welch_p": 0.841,
+    "monsoon_2016_2025_mean": 893.8,
+    "monsoon_1901_2015_mean": 887.5,
+    "monsoon_diff_mm": 6.2,
+    "monsoon_diff_pct": 0.7,
+    "monsoon_trend_1901_2025_mm_per_century": -15.3,
+    "monsoon_trend_p": 0.478
+  }
+}

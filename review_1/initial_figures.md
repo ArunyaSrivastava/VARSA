@@ -8,15 +8,16 @@
 
 | Figure | Description | Data Source | Status |
 |---|---|---|---|
-| Fig. 1 | (e.g. distribution of target variable) | (e.g. Kaggle Spotify) | (planned / draft / done) |
-| Fig. 2 | (e.g. correlation heatmap) | (e.g. audio features) | (planned / draft / done) |
-| Fig. 3 | (e.g. boxplot by category) | (e.g. genre vs popularity) | (planned / draft / done) |
-| Fig. 4 | (e.g. scatter plot) | (e.g. two numeric features) | (planned / draft / done) |
-| Fig. 5 | (e.g. line chart over time) | (e.g. release year) | (planned / draft / done) |
-| Fig. 6 | (e.g. duplicate-rate impact) | (e.g. duplicates vs unique) | (planned / draft / done) |
-| Fig. 7 | (e.g. multi-panel summary) | (e.g. any) | (planned / draft / done) |
+| Fig. 1 | Seasonal composition — monsoon share of the rainfall year, national and by division | pipeline layer | done (Review 3) |
+| Fig. 2 | Mean annual rainfall by division, coloured by CV + CV ranking | pipeline layer | done (Review 3) |
+| Fig. 3 | Annual rainfall distribution by division (boxplot, log scale) with Welch ANOVA / η² annotation | pipeline layer | done (Review 3) |
+| Fig. 4 | Pooled monsoon totals with Normal / Gamma / Lognormal fits + per-division best-fit counts | pipeline layer | done (Review 3) |
+| Fig. 5 | National trend with 95% CI + per-division OLS slopes flagged by BH significance | pipeline layer | done (Review 3) |
+| Fig. 6 | National deficit-year bar chart + per-division 1-in-20-year levels (% of normal) | pipeline layer | done (Review 3) |
+| Fig. 7 | 36 × 36 Pearson correlation heatmap of annual series | pipeline layer | done (Review 3) |
 
-Add or remove rows as needed.
+At Review 1 the figures existed as dashboard drafts; the polished, publication-ready
+versions were finalised in Review 3 by `scripts/final_analysis.py` (PNG, 200 dpi).
 
 ---
 
@@ -24,23 +25,25 @@ Add or remove rows as needed.
 
 | Figure | Script | Output |
 |---|---|---|
-| (e.g. Fig 1) | (e.g. `scripts/eda.py` → `research/figures/`) | (PNG) |
-| | | |
+| Fig. 1–7 | `scripts/final_analysis.py` | `review_3/fig1_seasonality.png` … `fig7_correlation_heatmap.png` |
+| Dashboard equivalents | `app.py` (Streamlit, interactive) | browser |
 
-Keep every figure reproducible from a script in `scripts/`.
+Every figure regenerates from one command; no manual steps.
 
 ---
 
 ## 3. Styling & Conventions
 
-- Use a consistent style (matplotlib defaults or a defined style file)
-- Labels, titles, units, and legends always included
-- High DPI (150–300) for publication-ready output
-- PNG for inline/dashboard, PDF for final report (if needed)
+- Consistent matplotlib style: light background, colour-blind-safe accents, grid #E2E8F0
+- Labels, titles, units and legends always included; 200 dpi PNG
+- Same colour semantics as the dashboard (green = monsoon/normal, amber = caution, red = deficit)
+- PNG for report/dashboard; figures live directly in `review_3/`
 
 ---
 
 ## 4. Notes
 
-- Figures are placeholders in Review 1; full polish happens in Review 3
-- Any figure that does not render or shows data issues should be flagged here
+- Review-1 drafts exposed two issues fixed for Review 3: threshold annotations overlapping
+  bars (Fig. 6) and legend placement over the confidence band (Fig. 5) — both corrected.
+- Figures that revealed data issues are flagged in the audit: negative winter values in
+  two divisions (Fig. 1's winter means exclude them).

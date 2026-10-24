@@ -1,0 +1,52 @@
+=== A. EXTENDED NATIONAL RECORD (observed, 1901-2026) ===
+annual series: 1901-2025 (complete years); 2026 in progress (monthly through Sep, monsoon complete)
+1901-2015 mean 1179.7 mm | 2016-2025 mean 1180.2 mm
+observed annual trend 1901-2025: -0.180 mm/yr (-18.0 mm/century), p=0.502 | MK tau=-0.028, p=0.646
+observed annual trend 1901-2015: -0.273 mm/yr (-27.3 mm/century), p=0.375
+decadal means (mm):
+year
+1900    1075.5
+1910    1191.2
+1920    1205.6
+1930    1244.3
+1940    1254.7
+1950    1225.0
+1960    1153.7
+1970    1161.3
+1980    1170.1
+1990    1210.9
+2000    1100.0
+2010    1131.6
+2020    1227.1
+[figure] fig8_extended_national_series.png
+
+=== B. OBSERVED SUBDIVISIONS (2015-2025, ACS Table 1) ===
+monsoon %departure extremes by year:
+  2016: wettest EAST RAJASTHAN (+32%) | driest KERALA (-34%)
+  2019: wettest SAURASHTRA & KUTCH (+66%) | driest HARYANA-CHD-DELHI (-42%)
+  2021: wettest MARATHAWADA (+48%) | driest NAGALAND-MANIPUR-MIZO-TRIPURA (-32%)
+  2022: wettest WEST RAJASTHAN (+58%) | driest BIHAR (-31%)
+  2023: wettest A & N ISLANDS (+55%) | driest KERALA (-34%)
+  2024: wettest SAURASHTRA & KUTCH (+75%) | driest PUNJAB (-28%)
+  2025: wettest WEST RAJASTHAN (+69%) | driest ARUNACHAL PRADESH (-42%)
+
+mean subdivision monsoon %departure by year:
+year
+2015   -15.1
+2016    -4.6
+2017    -1.9
+2018   -10.4
+2019    10.2
+2021     3.5
+2022     9.4
+2023    -2.8
+2024    10.6
+2025    12.7
+[figure] fig9_observed_departures.png
+
+=== C. WHAT THE EXTRA DECADE CHANGES ===
+2016-2025 vs 1901-2015 (observed annual): 1186.4 vs 1179.7 mm, Welch p=0.841
+monsoon: 2016-2025 mean 893.8 vs 1901-2015 mean 887.5 mm (diff +6.2 mm, +0.7%)
+observed monsoon trend 1901-2025: -15.3 mm/century, p=0.478
+
+[json] review_3/observed_results.json

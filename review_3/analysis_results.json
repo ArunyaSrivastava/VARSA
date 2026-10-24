@@ -1,0 +1,201 @@
+{
+  "audit": {
+    "rows": 20700,
+    "columns": 4,
+    "divisions": 36,
+    "years": 115,
+    "year_min": 1901,
+    "year_max": 2015,
+    "series_per_division": [
+      "ANNUAL",
+      "DJF",
+      "JAS",
+      "MAM",
+      "OND"
+    ],
+    "missing_cells": 0,
+    "duplicate_rows": 0,
+    "division_year_gaps": 0,
+    "negative_rainfall": 230,
+    "negative_detail": {
+      "seasons": [
+        "DJF"
+      ],
+      "divisions": [
+        "Madhya Bharat",
+        "Uttarakhand"
+      ],
+      "min_mm": -36.2,
+      "max_mm": -14.7,
+      "pct_of_rows": 1.11
+    },
+    "national_annual": {
+      "count": 115.0,
+      "mean": 1216.92,
+      "std": 148.25,
+      "min": 949.87,
+      "25%": 1078.39,
+      "50%": 1220.31,
+      "75%": 1351.22,
+      "max": 1488.8
+    }
+  },
+  "seasonality": {
+    "national_monsoon_share_pct": 73.7,
+    "national_seasonal_mm": {
+      "DJF": 74.0,
+      "MAM": 86.8,
+      "JAS": 882.3,
+      "OND": 154.3
+    },
+    "national_seasonal_share_pct": {
+      "DJF": 6.2,
+      "MAM": 7.2,
+      "JAS": 73.7,
+      "OND": 12.9
+    },
+    "division_monsoon_share_min": 67.8,
+    "division_monsoon_share_max": 80.3,
+    "division_monsoon_share_mean": 72.9,
+    "lowest_share_division": "South Interior Karnataka",
+    "highest_share_division": "Vidarbha",
+    "anova_season_F": 5785.6,
+    "anova_season_p": 0.0,
+    "anova_season_eta2": 0.512
+  },
+  "regional": {
+    "wettest_division": "Konkan & Goa",
+    "wettest_mean": 3511.0,
+    "driest_division": "Ladakh",
+    "driest_mean": 148.0,
+    "cv_min": 13.6,
+    "cv_min_division": "Kerala",
+    "cv_max": 70.3,
+    "cv_max_division": "Ladakh",
+    "anova_F": 727.2,
+    "anova_p": 0.0,
+    "levene_W": 27.8,
+    "levene_p": 1.200951802951845e-161,
+    "welch_F": 588.5,
+    "welch_df2": 1445.0,
+    "welch_p": 0.0,
+    "eta_squared": 0.861
+  },
+  "distributions": {
+    "pooled_jas": {
+      "n": 4140,
+      "skew": 1.39,
+      "excess_kurtosis": 1.02,
+      "shapiro_W": 0.829,
+      "shapiro_p": 5.51467894281616e-55,
+      "ks_normal": 0.185,
+      "ks_gamma": 0.094,
+      "ks_lognormal": 0.069
+    },
+    "pooled_annual": {
+      "skew": 1.45,
+      "ks_normal": 0.148,
+      "ks_gamma": 0.052,
+      "ks_lognormal": 0.065
+    },
+    "best_fit_division_counts": {
+      "normal": 33,
+      "gamma": 3,
+      "lognormal": 0
+    }
+  },
+  "trends": {
+    "national_slope_mm_per_yr": -0.341,
+    "national_p": 0.4154302606944275,
+    "national_slope_mm_per_century": -34.1,
+    "national_slope_ci95_per_century": [
+      -116.7,
+      48.5
+    ],
+    "sig_raw_count": 3,
+    "sig_bh_count": 0,
+    "sign_agreement_ols_mk": 36,
+    "n_divisions": 36,
+    "mean_sens_slope": -0.382,
+    "bh_significant_divisions": [],
+    "raw_significant_divisions": [
+      "East Rajasthan",
+      "Vidarbha",
+      "West Rajasthan"
+    ]
+  },
+  "drought": {
+    "national_normal_mm": 1217.0,
+    "national_below90_count": 31,
+    "national_below90_years": [
+      1918,
+      1919,
+      1920,
+      1921,
+      1922,
+      1923,
+      1924,
+      1925,
+      1926,
+      1927,
+      1928,
+      1929,
+      1950,
+      1951,
+      1952,
+      1953,
+      1954,
+      1955,
+      1958,
+      1979,
+      1981,
+      1982,
+      1983,
+      1984,
+      1985,
+      1986,
+      2009,
+      2010,
+      2011,
+      2013,
+      2015
+    ],
+    "national_below75_count": 0,
+    "driest_year": 1954,
+    "driest_year_mm": 950.0,
+    "driest_year_pct_of_normal": 78.1,
+    "wettest_year": 1935,
+    "wettest_year_mm": 1489.0,
+    "most_vulnerable_division": "West Rajasthan",
+    "most_vulnerable_1in20_pct": 15.8,
+    "most_stable_division": "Kerala",
+    "most_stable_1in20_pct": 77.8,
+    "mean_1in20_pct": 48.8,
+    "divisions_with_severe_drought_years": 36,
+    "mean_drought_frequency_pct": 20.3
+  },
+  "correlation": {
+    "n_pairs": 630,
+    "mean_r": 0.243,
+    "median_r": 0.236,
+    "max_r": 0.737,
+    "min_r": -0.152,
+    "critical_r_5pct": 0.183,
+    "sig_pairs": 409,
+    "sig_pair_pct": 64.9
+  },
+  "two_era": {
+    "era_a": "1950-1980",
+    "era_a_mean": 1206.3,
+    "era_a_n": 31,
+    "era_b": "1981-2015",
+    "era_b_mean": 1194.7,
+    "era_b_n": 35,
+    "diff_mm": -11.5,
+    "diff_pct": -0.96,
+    "welch_t": -0.325,
+    "welch_p": 0.7462,
+    "mannwhitney_p": 0.8271,
+    "levene_p": 0.5199
+  }
+}
