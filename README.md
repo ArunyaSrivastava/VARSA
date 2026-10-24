@@ -15,6 +15,21 @@ The website is a Streamlit dashboard exploring IMD subdivision rainfall data:
 - **Rehaul blueprint**: `docs/website_rehaul.md` — phased plan for more 3D models,
   better India map visualizations and a flashier UI (Phase 1 shipped)
 
+## 🚀 Live Static Edition on Vercel
+
+The repository includes a lightweight, ultra-responsive static edition built with Deck.gl and Plotly (`site/`), complete with the 3D Prism Atlas (1901–2026), 125-year playback, and live monsoon updates.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FArunyaSrivastava%2FVARSA&root-directory=site)
+
+### How to host on Vercel:
+1. **1-Click Import**: Click the **Deploy with Vercel** button above or visit [vercel.com/new](https://vercel.com/new).
+2. **Select Repo**: Import `ArunyaSrivastava/VARSA`.
+3. **Root Directory**: Both options work:
+   - Root directory set to `site` (uses `site/vercel.json`), or
+   - Root directory left as default `./` (uses root `vercel.json` rewrites).
+4. **Deploy**: Click **Deploy** — your live site will be ready at a `.vercel.app` URL in seconds!
+
+
 ## 📊 Project Structure
 
 ```
