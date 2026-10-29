@@ -96,13 +96,13 @@ def _footer(slide, page_num):
 
 
 def _section_label(slide, text, top_offset=None):
-    t = top_offset if top_offset is not None else MARGIN_L
-    _add_textbox(slide, MARGIN_L, t, W - 2 * MARGIN_L, emu(0.6),
+    t = emu(0.8)
+    _add_textbox(slide, MARGIN_L, t, W - 2 * MARGIN_L, emu(0.55),
                   text, 8.5, bold=True, color=AMBER)
 
 
 def _heading(slide, text, top_offset=None, size=24):
-    t = top_offset if top_offset is not None else MARGIN_L + emu(0.65)
+    t = emu(1.45)
     _add_textbox(slide, MARGIN_L, t, W - 2 * MARGIN_L, emu(1.5),
                  text, size, bold=True, color=WHITE)
 

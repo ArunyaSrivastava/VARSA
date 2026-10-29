@@ -54,3 +54,6 @@ models/
 Thumbs.db
 *.swp
 *~
+
+# Cloned comparison repos
+cloned_repos/
