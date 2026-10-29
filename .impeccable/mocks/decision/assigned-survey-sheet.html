@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>The Survey Sheet — assigned</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Public+Sans:wght@400;600;700&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}
+body{width:1440px;height:900px;overflow:hidden;background:#FBF8F1;color:#1C1917;font-family:"Public Sans",sans-serif;position:relative}
+/* graticule rail: the page's one signature system — every section header registers to it */
+.rail{position:absolute;top:0;bottom:0;width:1px;background:rgba(28,25,23,.14)}
+.r1{left:72px}.r2{left:50%}.r3{right:72px}
+.ticks{position:absolute;top:0;bottom:0;left:72px;right:72px;pointer-events:none;
+ background:repeating-linear-gradient(to bottom,rgba(28,25,23,.12) 0 1px,transparent 1px 60px)}
+header{position:absolute;top:0;left:0;right:0;height:64px;display:flex;align-items:center;
+ justify-content:space-between;padding:0 72px;border-bottom:1px solid #1C1917;background:#FBF8F1;position:absolute;z-index:3}
+.wordmark{font-family:"Bricolage Grotesque";font-weight:800;font-size:26px;letter-spacing:-.02em}
+.wordmark span{color:#C0532E}
+nav{display:flex;gap:28px;font-size:14px;font-weight:600}
+nav b{border-bottom:2px solid #C0532E;padding-bottom:2px}
+/* cartouche = sheet title block, top-left under nav */
+.cartouche{position:absolute;left:72px;top:88px;width:430px;border:1.5px solid #1C1917;background:#FBF8F1;z-index:2}
+.cartouche h1{font-family:"Bricolage Grotesque";font-weight:800;font-size:44px;line-height:1.02;letter-spacing:-.025em;padding:18px 20px 10px}
+.cartouche h1 em{font-style:normal;color:#C0532E}
+.cartouche .sub{padding:0 20px 14px;font-size:13.5px;line-height:1.45;color:#4A443C}
+.cartouche .row{display:flex;border-top:1px solid #1C1917;font-size:11.5px}
+.cartouche .row div{flex:1;padding:7px 10px;border-right:1px solid #1C1917;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.cartouche .row div:last-child{border-right:none}
+.cartouche .row b{display:block;font-family:"Spline Sans Mono";font-size:15px;letter-spacing:0;text-transform:none}
+/* the one plot owning the field: 125-year departure ribbon as mapped terrain */
+.sheet{position:absolute;left:430px;right:72px;top:88px;bottom:250px;border:1.5px solid #1C1917;background:#F4EFE3;z-index:1}
+.sheet .plate-head{display:flex;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #1C1917;
+ font-size:11px;letter-spacing:.08em;font-weight:700;text-transform:uppercase}
+.ribbon{position:absolute;left:16px;right:16px;top:50%;height:220px;transform:translateY(-50%)}
+.ribbon svg{width:100%;height:100%}
+.y2026{position:absolute;right:14px;top:12px;font-family:"Spline Sans Mono";font-size:12px;background:#C0532E;color:#FBF8F1;padding:3px 8px;font-weight:600}
+/* ledger-dense module strip along the bottom (density courage) */
+.ledger{position:absolute;left:72px;right:72px;bottom:0;height:186px;border-top:1.5px solid #1C1917;display:flex;background:#FBF8F1}
+.ledger .cell{flex:1;border-right:1px solid rgba(28,25,23,.35);padding:12px 14px}
+.ledger .cell:last-child{border-right:none}
+.ledger .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:#4A443C}
+.ledger .v{font-family:"Bricolage Grotesque";font-weight:800;font-size:30px;letter-spacing:-.02em;margin-top:4px}
+.ledger .v small{font-size:15px;font-weight:700}
+.ledger .n{font-size:11.5px;color:#4A443C;margin-top:3px;line-height:1.35}
+.ink{color:#C0532E}
+</style></head><body>
+<div class="ticks"></div><div class="rail r1"></div><div class="rail r2"></div><div class="rail r3"></div>
+<header>
+  <div class="wordmark">VARSA<span>.</span></div>
+  <nav><b>Survey</b><span>Atlas</span><span>Dossier</span><span>Comparisons</span><span>Method</span></nav>
+</header>
+<div class="cartouche">
+  <h1>The 2026 monsoon is <em>12.6% below</em> normal.</h1>
+  <div class="sub">759.4 mm fell June–September against an 888 mm normal — the newest reading on a
+  125-year survey of India's rainfall, every figure provenance-stamped.</div>
+  <div class="row">
+    <div>Season<b>Jun–Sep</b></div>
+    <div>Actual<b>759.4 mm</b></div>
+    <div>Normal<b>888.0 mm</b></div>
+    <div class="ink">Departure<b>−12.6%</b></div>
+  </div>
+</div>
+<div class="sheet">
+  <div class="plate-head"><span>Plate I — All-India monsoon departure, 1901–2026</span><span>1 : 125 years</span></div>
+  <div class="y2026">2026 · provisional</div>
+  <div class="ribbon"><svg viewBox="0 0 900 220" preserveAspectRatio="none">
+    <line x1="0" y1="110" x2="900" y2="110" stroke="#1C1917" stroke-width="1.2" stroke-dasharray="5 4"/>
+    <path d="M0,118 8,112 15,124 23,100 30,118 38,96 46,112 54,88 61,108 69,120 77,104 85,92 92,116 100,102
+    108,126 115,94 123,110 131,86 138,104 146,122 154,98 161,114 169,90 177,108 185,126 192,96 200,112 208,88
+    215,106 223,124 231,100 238,116 246,94 254,110 262,128 269,102 277,118 285,92 292,108 300,122 308,98
+    315,114 323,90 331,106 338,124 346,100 354,116 362,94 369,110 377,126 385,96 392,112 400,88 408,106
+    415,122 423,102 431,118 438,92 446,108 454,124 462,100 469,114 477,90 485,106 492,122 500,98 508,114
+    515,88 523,106 531,120 538,96 546,112 554,126 562,100 569,116 577,92 585,108 592,124 600,98 608,112
+    615,90 623,106 631,122 638,102 646,116 654,94 662,110 669,126 677,100 685,114 692,92 700,108 708,124
+    715,98 723,114 731,90 738,106 746,122 754,104 762,118 769,96 777,110 785,126 792,100 800,116 808,94
+    815,108 823,124 831,102 838,116 846,96 854,110 862,128 869,104 877,118 885,98 892,112 900,126"
+    fill="none" stroke="#C0532E" stroke-width="2"/>
+  </svg></div>
+</div>
+<div class="ledger">
+  <div class="cell"><div class="k">Monsoon share</div><div class="v">73.7<small>%</small></div><div class="n">of the rainfall year falls Jun–Sep, in every one of 36 subdivisions</div></div>
+  <div class="cell"><div class="k">Variance by region</div><div class="v">η²=0.861</div><div class="n">Welch ANOVA; ordinary ANOVA invalid (Levene p≈10⁻¹⁶¹)</div></div>
+  <div class="cell"><div class="k">Reliability range</div><div class="v">13.6–70.3<small>%</small></div><div class="n">CV from Kerala (steadiest) to Ladakh (least reliable)</div></div>
+  <div class="cell"><div class="k">Trends after BH</div><div class="v ink">0 / 36</div><div class="n">3 raw p&lt;0.05 fall to zero at 5% FDR — null result, reported</div></div>
+  <div class="cell"><div class="k">1-in-20-yr deficit</div><div class="v">15.8<small>%</small></div><div class="n">of normal, West Rajasthan — drought risk is local</div></div>
+</div>
+</body></html>
