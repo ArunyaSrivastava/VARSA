@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Monsoon Water — pick</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}
+body{width:1440px;height:900px;overflow:hidden;background:#07182B;color:#E9F1F4;
+ font-family:"Spline Sans Mono",monospace;position:relative}
+/* depth tints: the page IS water — three bands, darker with depth */
+.band{position:absolute;left:0;right:0}
+.b1{top:0;height:210px;background:#0A2338}
+.b2{top:210px;height:420px;background:#07182B}
+.b3{bottom:0;height:270px;background:#04101F}
+.gr{position:absolute;top:0;bottom:0;width:1px;background:rgba(127,209,240,.14)}
+.g{left:180px}.g2{left:480px}.g3{left:780px}.g4{left:1080px}.g5{right:120px}
+/* graduated scale on the left: the staff gauge */
+.scale{position:absolute;left:56px;top:64px;bottom:64px;width:46px;border:2px solid #E9F1F4;border-radius:3px;
+ background:linear-gradient(to top,#7FD1F0 0 62%,#F2B441 62% 78%,#3E7EA6 78% 100%)}
+.scale .m{position:absolute;left:-58px;width:44px;text-align:right;font-size:12px;color:#9FC3D6}
+header{position:absolute;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 120px 0 140px;border-bottom:1px solid rgba(127,209,240,.2);z-index:3;background:rgba(7,24,43,.85)}
+.wordmark{font-family:"Bricolage Grotesque";font-weight:800;font-size:24px;letter-spacing:-.02em;color:#E9F1F4}
+nav{display:flex;gap:26px;font-size:13.5px;color:#9FC3D6}
+nav b{color:#E9F1F4;border-bottom:2px solid #F2B441;padding-bottom:2px}
+/* hero: the current reading, set like a gauge label */
+.reading{position:absolute;left:140px;top:130px;width:640px;z-index:2}
+.reading .yr{font-size:14px;letter-spacing:.22em;color:#F2B441;font-weight:600}
+.reading h1{font-family:"Bricolage Grotesque";font-weight:800;font-size:64px;line-height:1.03;letter-spacing:-.025em;margin:10px 0 14px}
+.reading h1 b{color:#F2B441}
+.reading p{font-size:15px;line-height:1.55;color:#9FC3D6;max-width:52ch}
+.reading p b{color:#E9F1F4}
+/* the gauge band: this year against normal */
+.gaugeband{position:absolute;left:140px;right:120px;top:420px;z-index:2}
+.gb-head{display:flex;justify-content:space-between;font-size:12.5px;color:#9FC3D6;margin-bottom:8px}
+.gb{position:relative;height:26px;border:1px solid rgba(127,209,240,.4);border-radius:4px;overflow:hidden}
+.gb .fill{position:absolute;inset:0;width:85.5%;background:#F2B441}
+.gb .norm{position:absolute;top:-6px;bottom:-6px;left:100%;width:2px;background:#E9F1F4}
+.gb-mark{display:flex;justify-content:space-between;font-family:"Bricolage Grotesque";font-weight:700;font-size:15px;margin-top:8px}
+/* depth-listed ledger, set as station log */
+.log{position:absolute;left:140px;right:120px;top:540px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;
+ background:rgba(127,209,240,.18);border:1px solid rgba(127,209,240,.18);z-index:2}
+.log div{background:#07182B;padding:16px 18px}
+.log .k{font-size:11px;letter-spacing:.18em;color:#7FD1F0;text-transform:uppercase}
+.log .v{font-family:"Bricolage Grotesque";font-weight:800;font-size:34px;margin-top:6px;letter-spacing:-.02em}
+.log .v.am{color:#F2B441}
+.log .n{font-size:12px;color:#9FC3D6;margin-top:4px;line-height:1.4}
+footer{position:absolute;bottom:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 120px 0 140px;font-size:12px;color:#7FA8BE;border-top:1px solid rgba(127,209,240,.15);z-index:3}
+</style></head><body>
+<div class="band b1"></div><div class="band b2"></div><div class="band b3"></div>
+<div class="gr g"></div><div class="gr g2"></div><div class="gr g3"></div><div class="gr g4"></div><div class="gr g5"></div>
+<header>
+  <div class="wordmark">VARSA</div>
+  <nav><b>Gauge</b><span>Atlas</span><span>Record</span><span>Dossier</span><span>Comparisons</span></nav>
+</header>
+<div class="scale">
+  <div class="m" style="top:2%">1500</div><div class="m" style="top:22%">1200</div>
+  <div class="m" style="top:42%">900</div><div class="m" style="top:62%">600</div><div class="m" style="top:82%">300</div>
+</div>
+<div class="reading">
+  <div class="yr">READING · 2026 MONSOON · PROVISIONAL</div>
+  <h1>The water year stands <b>12.6% below</b> the normal line.</h1>
+  <p>759.4 mm of rain fell across India June–September against an <b>888 mm</b> normal — the newest
+  mark on a <b>125-year</b> gauge of the Indian monsoon, every level on this page provenance-stamped:
+  observed IMD readings, validated pipeline record, or provisional year-to-date.</p>
+</div>
+<div class="gaugeband">
+  <div class="gb-head"><span>2026 actual</span><span>normal 888 mm</span></div>
+  <div class="gb"><div class="fill"></div><div class="norm"></div></div>
+  <div class="gb-mark"><span>759.4 mm</span><span>−12.6%</span></div>
+</div>
+<div class="log">
+  <div><div class="k">Monsoon share</div><div class="v">73.7%</div><div class="n">of the rainfall year arrives Jun–Sep, in all 36 subdivisions</div></div>
+  <div><div class="k">Variance by region</div><div class="v">η²=0.861</div><div class="n">where you are decides your rain; the year barely matters</div></div>
+  <div><div class="k">Trends after correction</div><div class="v am">0 / 36</div><div class="n">125 years, no trend that survives Benjamini–Hochberg</div></div>
+  <div><div class="k">Steadiest · wildest</div><div class="v">13.6–70.3%</div><div class="n">CV: Kerala steadiest, Ladakh least reliable</div></div>
+  <div><div class="k">1-in-20-yr deficit</div><div class="v am">15.8%</div><div class="n">of normal, West Rajasthan — drought risk is local</div></div>
+  <div><div class="k">Record</div><div class="v">1901–2026</div><div class="n">observed IMD + validated pipeline · 2026 provisional</div></div>
+</div>
+<footer><span>VARSA · Variability, Anomalies &amp; Regional Statistics of Indian Rainfall</span><span>IMD · 1901–2026</span></footer>
+</body></html>
