@@ -5,93 +5,147 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VARSA — Variability, Anomalies and Regional Statistics of Indian Rainfall</title>
 <meta name="description" content="Interactive 3D atlas of Indian monsoon rainfall, 1901–2026, built on observed IMD subdivision data.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B1428'/%3E%3Cpath d='M8 9l8 14 8-14' stroke='%23E0A526' stroke-width='3.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23FBF8F1'/%3E%3Crect x='1' y='1' width='30' height='30' rx='4' fill='none' stroke='%231C1917' stroke-width='2'/%3E%3Cpath d='M9 10l7 12 7-12' stroke='%23C0532E' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://unpkg.com/deck.gl@9.1.5/dist.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
 
-<header class="hero">
-  <div class="hero-inner">
-    <div class="brand">
-      <span class="kicker">PROBABILITY &amp; STATISTICS · BAMAT207</span>
-      <h1>VARSA</h1>
-      <p class="tagline">Variability, Anomalies and Regional Statistics of Indian Rainfall</p>
-      <p class="sub">36 IMD subdivisions · 1901–2026 · observed data + validated pipeline</p>
-    </div>
-    <div class="badges">
-      <span class="badge amber">observed IMD · CMPG</span>
-      <span class="badge blue">3D prism atlas</span>
-      <span class="badge">every number reproducible</span>
-    </div>
-  </div>
+<header class="masthead">
+  <div class="wordmark">VARSA<span class="mark">.</span></div>
+  <nav>
+    <a href="#plate1" class="here">Survey</a>
+    <a href="#atlas">Atlas</a>
+    <a href="#plate2">Record</a>
+    <a href="#method">Method</a>
+  </nav>
 </header>
 
-<div class="wrap">
-  <div id="live-banner" class="banner" hidden>
-    <span class="banner-icon">🌧️</span>
-    <div class="banner-text">
-      <b id="banner-title"></b>
-      <div class="banner-sub">Observed IMD data (CMPG) · the map, chart and banner update with every data refresh</div>
-    </div>
-    <span class="badge blue">observed · live</span>
-  </div>
+<main class="sheet">
 
-  <section class="kpis" id="kpis"></section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2>🏗️ The subcontinent as a bar chart of itself</h2>
-      <p>Every IMD subdivision extruded to its seasonal rainfall — <b>height&nbsp;=&nbsp;mm</b>,
-         <b>colour&nbsp;=&nbsp;% departure from normal</b>. 2016–2025 uses observed IMD values;
-         1901–2015 the validated pipeline layer (anomaly vs long-run mean).</p>
+  <!-- ── FIRST VIEWPORT: cartouche + Plate I + ledger strip ─────────────── -->
+  <section class="first-viewport" id="plate1">
+    <div class="cartouche">
+      <h1>The <em id="cart-dep">2026</em> monsoon is
+        <span id="cart-pct" class="dep-ink">−12.6%</span> below normal.</h1>
+      <p class="cart-sub">759.4&nbsp;mm fell June–September against an 888&nbsp;mm normal —
+        the newest reading on a 125-year survey of India's rainfall, every figure
+        provenance-stamped.</p>
+      <div class="cart-rows" id="cart-rows">
+        <div><i>Season</i><b>Jun–Sep</b></div>
+        <div><i>Actual</i><b id="cart-mm">759.4 mm</b></div>
+        <div><i>Normal</i><b>888.0 mm</b></div>
+        <div><i>Departure</i><b id="cart-dep2" class="dep-ink">−12.6%</b></div>
+      </div>
     </div>
+
+    <figure class="plate" id="plate1-fig">
+      <figcaption class="plate-head">
+        <span>Plate I — All-India monsoon departure, 1901–2026</span>
+        <span class="scale-note">1&nbsp;:&nbsp;125 years</span>
+      </figcaption>
+      <div class="ribbon-holder">
+        <svg id="ribbon-hero" class="ribbon" viewBox="0 0 1000 300" preserveAspectRatio="none" role="img"
+             aria-label="Bar chart of all-India monsoon rainfall departure from normal for every year 1901 to 2026"></svg>
+        <div class="stamp provisional" id="hero-stamp" hidden>2026 · provisional</div>
+        <div class="stamp gated" id="hero-gate" hidden>2020 · gated</div>
+      </div>
+    </figure>
+
+    <div class="ledger" id="kpis" aria-label="Headline findings"></div>
+  </section>
+
+  <!-- ── ATLAS ──────────────────────────────────────────────────────────── -->
+  <section class="ruled" id="atlas">
+    <h2 class="rule-head">
+      <svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 15.5 10 3l7 12.5H3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 9.5h7M10 3v12.5" stroke="currentColor" stroke-width="1" opacity=".55"/></svg>
+      Atlas of the subcontinent — <span id="atlas-title">Monsoon 2025</span>
+    </h2>
+    <p class="section-sub">Every IMD subdivision extruded to its seasonal rainfall —
+      <b>height&nbsp;=&nbsp;mm</b>, <b>colour&nbsp;=&nbsp;% departure from normal</b>.
+      2016–2025 carries observed IMD values; 1901–2015 the validated pipeline layer
+      (anomaly against its long-run mean).</p>
+
     <div class="controls">
-      <div class="pills" id="season-pills"></div>
+      <div class="pills" id="season-pills" role="tablist" aria-label="Season"></div>
       <div class="year-row">
-        <button id="play-btn" title="Replay 125 years">▶</button>
-        <input type="range" id="year-slider" min="1901" max="2026" value="2025">
+        <button id="play-btn" aria-label="Replay 125 years" title="Replay 125 years">
+          <svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path id="play-path" d="M4 2.5v11l9-5.5-9-5.5Z" fill="currentColor"/></svg>
+        </button>
+        <input type="range" id="year-slider" min="1901" max="2026" value="2025" aria-label="Year">
         <span class="year-readout" id="year-readout">2025</span>
       </div>
-      <div class="legend">
-        <span class="sw" style="--c:#1d4ed8"></span>+20%+
-        <span class="sw" style="--c:#22c55e"></span>normal / excess
-        <span class="sw" style="--c:#eab308"></span>−20–0%
-        <span class="sw" style="--c:#f97316"></span>−40–−20%
-        <span class="sw" style="--c:#dc2626"></span>−40% or worse
-        <span class="sw" style="--c:#788291"></span>no data
-        <span class="hint">drag to pan · ctrl+drag to tilt &amp; rotate · scroll to zoom</span>
-      </div>
+    </div>
+    <div class="legend" id="legend">
+      <span class="sw" style="--c:#1d4ed8"></span>+20%+
+      <span class="sw" style="--c:#22c55e"></span>normal / excess
+      <span class="sw" style="--c:#eab308"></span>−20–0%
+      <span class="sw" style="--c:#f97316"></span>−40–−20%
+      <span class="sw" style="--c:#dc2626"></span>−40% or worse
+      <span class="sw" style="--c:#8B857A"></span>no data
+      <span class="hint">drag to pan · ctrl+drag to tilt &amp; rotate · scroll to zoom</span>
     </div>
     <div id="map-frame"><canvas id="deck-canvas"></canvas>
       <div id="map-note" class="map-note" hidden></div>
     </div>
   </section>
 
-  <section class="panel">
-    <div class="panel-head row">
-      <h2>125 years, one chart</h2>
-      <div class="pills small" id="series-pills"></div>
+  <!-- ── PLATE II: the national record ──────────────────────────────────── -->
+  <section class="ruled" id="plate2">
+    <h2 class="rule-head">
+      <svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 17V3M2 17h16" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 13v-4M8 13V6M11.5 13V9M15 13v-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      The national record — 125 years, one sheet
+    </h2>
+    <div class="controls">
+      <div class="pills small" id="series-pills" role="tablist" aria-label="Series"></div>
     </div>
-    <div id="national-chart"></div>
+    <figure class="plate full">
+      <div class="ribbon-holder tall">
+        <svg id="ribbon-national" class="ribbon" viewBox="0 0 1000 300" preserveAspectRatio="none" role="img"
+             aria-label="Bar chart of the selected national rainfall series, 1901 to 2026"></svg>
+        <div class="stamp provisional" id="nat-stamp" hidden>2026 · provisional</div>
+      </div>
+    </figure>
     <p class="caption" id="series-caption"></p>
   </section>
 
-  <footer>
+  <!-- ── METHOD / PROVENANCE ────────────────────────────────────────────── -->
+  <section class="ruled" id="method">
+    <h2 class="rule-head">
+      <svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 3h9l3 3v11H4V3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 8h6M7 11h6M7 14h4" stroke="currentColor" stroke-width="1.2"/></svg>
+      Method — where every figure comes from
+    </h2>
+    <table class="provenance">
+      <thead><tr><th>Layer</th><th>Years</th><th>Source</th><th>Validation</th></tr></thead>
+      <tbody>
+        <tr><td>Observed IMD — subdivisions</td><td class="mono">2015–2025</td>
+            <td><div style="max-width:470px">IMD Pune Annual Climate Summaries, Table&nbsp;1 (36 subdivisions × 4 seasons + annual)</div></td>
+            <td><div style="max-width:430px">Every cell checked against IMD's printed % departure; season sums reconcile with annuals (99.4%)</div></td></tr>
+        <tr><td>Observed IMD — national &amp; regions</td><td class="mono">1901–2026</td>
+            <td><div style="max-width:470px">IMD CMPG live tables (monthly; Jun–Sep monsoon)</div></td>
+            <td><div style="max-width:430px">Cross-source agreement ≤0.1&nbsp;mm in 9 of 11 recent years; 2026 provisional</div></td></tr>
+        <tr><td>Pipeline layer — subdivisions</td><td class="mono">1901–2015</td>
+            <td><div style="max-width:470px">Generated, IMD-calibrated (seeded); the dashboard's historical base</div></td>
+            <td><div style="max-width:430px">Validated against the raw IMD reference layer — same conclusions on both</div></td></tr>
+        <tr><td class="gap" colspan="4"><div style="max-width:480px">Gaps: 2020's subdivision table fails machine validation and is excluded rather than shown wrong · 2026 subdivision values are not yet published · the 2026 national monsoon is provisional (Jun–Sep only).</div></td></tr>
+      </tbody>
+    </table>
+    <p class="method-note">Departure colour carries meaning everywhere on this sheet:
+      <span class="sw" style="--c:#1d4ed8"></span>+20%+
+      <span class="sw" style="--c:#22c55e"></span>normal
+      <span class="sw" style="--c:#eab308"></span>−20–0%
+      <span class="sw" style="--c:#f97316"></span>−40–−20%
+      <span class="sw" style="--c:#dc2626"></span>≤−40%.</p>
+  </section>
+
+  <footer class="colophon">
     <p><b>VARSA</b> — Pratik (25BCE0337) · Adarsh (25BCE0401) · Arunya (25BCE0344) ·
        guide: Dr. Juhi Baroi · Probability &amp; Statistics (BAMAT207)</p>
-    <p>Data: IMD Climate Research &amp; Services Pune (Annual Climate Summaries 2015–2025;
-       CMPG monthly/monsoon tables 1901–2026) + IMD-calibrated pipeline layer for 1901–2015.
-       The 2020 subdivision table is excluded (fails machine validation); 2026 subdivision
-       values are not yet published.</p>
-    <p class="fine">This is the static Vercel edition of the VARSA Streamlit dashboard —
-       full statistical dossier, trend tests and distribution fits live in the repo.</p>
+    <p>Data: India Meteorological Department — Climate Research &amp; Services, Pune.
+       The 3D atlas, the plates and this sheet regenerate from the repository's
+       validated data pipeline.</p>
   </footer>
-</div>
+</main>
 
 <script src="assets/app.js"></script>
 </body>

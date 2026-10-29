@@ -143,6 +143,8 @@ def main():
                     for y in years],
         "monsoon_dep": [round(float(ai_mon["jun_sep_dep"].get(y, np.nan)), 1) if y in ai_mon.index else None
                         for y in years],
+        # years whose monsoon value is provisional (current year, Jun-Sep only)
+        "monsoon_provisional_years": [int(ai_mon.index.max())],
     }
     (SITE / "national.json").write_text(json.dumps(national))
     print(f"national.json: {len(years)} years")

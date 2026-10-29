@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>The Catalog Sleeve — challenger</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}
+body{width:1440px;height:900px;overflow:hidden;background:#0E0E12;color:#F2F2F0;
+ font-family:"Spline Sans Mono",monospace;position:relative}
+header{position:absolute;top:0;left:0;right:0;height:58px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 56px;border-bottom:1px solid rgba(242,242,240,.16)}
+.wordmark{font-family:"Bricolage Grotesque";font-weight:800;font-size:22px;letter-spacing:.04em}
+nav{display:flex;gap:24px;font-size:11px;letter-spacing:.14em;color:#8B8B93}
+nav b{color:#F2F2F0}
+/* the one plot owning the field */
+.pulse{position:absolute;left:56px;right:56px;top:110px;bottom:250px}
+.pulse svg{width:100%;height:100%}
+.cat{position:absolute;left:56px;top:76px;font-size:11px;letter-spacing:.2em;color:#8B8B93}
+.cat b{color:#F2F2F0}
+/* year codes as catalog entries */
+.codes{position:absolute;left:56px;right:56px;bottom:196px;display:flex;justify-content:space-between;
+ font-size:10.5px;color:#6E6E76}
+.codes b{color:#E8B84B;font-weight:600}
+/* decoded strip: hover translates blocks to text (static: one decoded) */
+.strip{position:absolute;left:56px;right:56px;bottom:120px;display:flex;gap:4px}
+.strip i{flex:1;height:14px;background:#232329}
+.strip i.g{background:#3E7EA6}.strip i.a{background:#E8B84B}.strip i.r{background:#B03A2E}
+.strip .dec{position:absolute;right:0;bottom:24px;font-size:11px;color:#E8B84B}
+/* bottom facts as catalogue data lines */
+.facts{position:absolute;left:56px;right:56px;bottom:0;height:96px;border-top:1px solid rgba(242,242,240,.16);
+ display:grid;grid-template-columns:repeat(4,1fr)}
+.facts div{padding:16px 20px;border-right:1px solid rgba(242,242,240,.1)}
+.facts div:last-child{border-right:none}
+.facts .k{font-size:10px;letter-spacing:.18em;color:#6E6E76}
+.facts .v{font-family:"Bricolage Grotesque";font-weight:800;font-size:28px;margin-top:6px;letter-spacing:-.02em}
+.facts .v.am{color:#E8B84B}
+</style></head><body>
+<header><div class="wordmark">VARSA</div>
+ <nav><b>THE RECORD</b><span>ATLAS</span><span>DOSSIER</span><span>METHOD</span></nav></header>
+<div class="cat">CATALOGUE <b>VAR-1901/2026</b> · ALL-INDIA MONSOON · JUN–SEP · MM DEPARTURE FROM 888 NORMAL</div>
+<div class="pulse"><svg viewBox="0 0 1328 540" preserveAspectRatio="none">
+  <line x1="0" y1="270" x2="1328" y2="270" stroke="#2A2A31" stroke-width="1"/>
+  <line x1="0" y1="270" x2="1328" y2="270" stroke="#F2F2F0" stroke-width="1" stroke-dasharray="3 6" opacity=".5"/>
+  <path d="M2,286 12,272 22,300 32,254 42,282 52,238 62,274 72,220 82,264 92,296 102,258 112,242 122,290
+  132,264 142,312 152,246 162,278 172,232 182,262 192,302 202,250 212,278 222,224 232,266 242,312 252,242
+  262,276 272,222 282,260 292,306 302,252 312,282 322,230 332,266 342,314 352,254 362,288 372,236 382,270
+  382,322 392,248 402,280 412,226 422,262 432,304 442,254 452,286 462,236 472,268 482,316 492,246 502,278
+  512,224 522,262 532,300 542,248 552,276 562,322 572,250 582,284 592,230 602,264 612,308 622,246 632,276
+  642,224 652,260 662,302 672,252 682,280 692,230 702,264 712,306 722,248 732,278 742,226 752,262 762,300
+  772,252 782,280 792,228 802,264 812,304 822,250 832,276 842,224 852,262 872,298 882,246 892,274 902,222
+  912,258 922,300 932,248 942,276 952,222 962,258 972,296 982,246 992,272 1002,318 1012,248 1022,272
+  1032,320 1042,250 1052,274 1062,222 1072,258 1082,298 1092,246 1102,270 1112,316 1122,252 1132,274
+  1142,220 1152,256 1162,294 1172,250 1182,276 1192,322 1202,248 1212,272 1222,318 1232,254 1242,272
+  1252,316 1262,258 1272,270 1282,312 1292,266 1302,274 1312,312 1328,290"
+  fill="none" stroke="#F2F2F0" stroke-width="1.6"/>
+  <circle cx="1318" cy="288" r="4" fill="#E8B84B"/>
+</svg></div>
+<div class="codes"><span>1901</span><span>1920</span><span>1940</span><span>1960</span><span>1980</span><span>2000</span><span>2020</span><b>2026 →</b></div>
+<div class="strip">
+  <i class="a"></i><i class="a"></i><i></i><i class="a"></i><i class="g"></i><i></i><i class="a"></i><i class="g"></i>
+  <i></i><i class="a"></i><i class="g"></i><i></i><i></i><i class="a"></i><i class="g"></i><i></i><i class="a"></i>
+  <i class="g"></i><i></i><i class="a"></i><i class="g"></i><i></i><i class="r"></i><i class="g"></i><i></i>
+  <i class="a"></i><i class="g"></i><i></i><i class="g"></i><i class="a"></i><i></i><i class="g"></i><i></i>
+  <i class="a"></i><i class="g"></i><i></i><i class="g"></i><i class="a"></i><i></i><i class="g"></i><i></i>
+  <i></i><i class="r"></i><i class="g"></i><i></i><i class="g"></i><i class="a"></i><i></i><i class="g"></i>
+  <div class="dec">2026 · 759.4 mm · −12.6% · provisional</div>
+</div>
+<div class="facts">
+  <div><div class="k">MONSOON SHARE</div><div class="v">73.7%</div></div>
+  <div><div class="k">REGION EFFECT</div><div class="v">η²=0.861</div></div>
+  <div><div class="k">TREND AFTER BH</div><div class="v am">0/36</div></div>
+  <div><div class="k">1-IN-20 DEFICIT</div><div class="v">15.8%</div></div>
+</div>
+</body></html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>The Dense Sheet — challenger</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}
+body{width:1440px;height:900px;overflow:hidden;background:#FFFFFF;color:#111;font-family:"Spline Sans Mono",monospace}
+/* hairline module mosaic — everything rules to one grid */
+.wrap{position:absolute;inset:0;display:grid;grid-template-columns:280px 1fr 1fr 1fr;grid-template-rows:56px 118px 1fr 210px 40px;
+ border:2px solid #111}
+.w{border-right:1px solid #111;border-bottom:1px solid #111}
+header{grid-column:1/5;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.wordmark{font-family:"Bricolage Grotesque";font-weight:800;font-size:22px}
+nav{display:flex;gap:18px;font-size:12px}
+nav b{background:#E03A2F;color:#fff;padding:3px 8px;font-weight:600}
+/* red tab module heads */
+.tab{font-size:10.5px;font-weight:600;background:#E03A2F;color:#fff;display:inline-block;padding:3px 8px;letter-spacing:.05em}
+.mod{padding:10px 12px;overflow:hidden}
+.mod .k{font-size:11px;color:#555;margin-top:6px;line-height:1.35}
+.big{grid-column:1/3}
+.big .v{font-family:"Bricolage Grotesque";font-weight:800;font-size:84px;letter-spacing:-.03em;line-height:.95}
+.big .v span{font-size:30px}
+.big .lbl{font-size:12px;color:#555;margin-top:6px}
+/* 36-cell subdivision mosaic */
+.mosaic{grid-column:1/4;display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:1fr;gap:1px;background:#111}
+.mosaic div{background:#fff;padding:4px 6px;font-size:10px;overflow:hidden}
+.mosaic b{display:block;font-size:10.5px;font-weight:600}
+.mosaic .ok{color:#0B7A3E}.mosaic .def{color:#E03A2F}
+.mosaic .ex{background:#E03A2F;color:#fff}.mosaic .ex b,.mosaic .ex span{color:#fff}
+.mosaic .wl{background:#FBE9E7}
+/* ribbon module */
+.ribbon{grid-column:1/5;position:relative;padding:10px 16px}
+.ribbon svg{position:absolute;inset:28px 16px 10px;width:calc(100% - 32px);height:calc(100% - 44px)}
+footer{grid-column:1/5;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:10.5px;color:#555}
+</style></head><body>
+<div class="wrap">
+<header><div class="wordmark">VARSA</div><nav><b>MONSOON 2026: −12.6%</b><span>ATLAS</span><span>DOSSIER</span><span>METHOD</span></nav></header>
+<div class="mod w big"><span class="tab">LIVE READING</span>
+  <div class="v">759.4<span> mm</span></div><div class="lbl">Jun–Sep 2026 · provisional · normal 888 mm · departure −12.6%</div></div>
+<div class="mod w"><span class="tab">SEASONALITY</span><div class="k" style="margin-top:8px">Monsoon share of the rainfall year</div>
+  <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:44px">73.7%</div><div class="k">identical structure in all 36 subdivisions (67.8–80.3%)</div></div>
+<div class="mod w"><span class="tab">VARIANCE</span><div class="k" style="margin-top:8px">Region explains annual rainfall</div>
+  <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:44px">η²=0.861</div><div class="k">Welch ANOVA F(35,1445)=588.5 · Levene rejects equal variances</div></div>
+<div class="mod w"><span class="tab">TREND VERDICT</span><div class="k" style="margin-top:8px">Subdivisions significant after BH</div>
+  <div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:44px;color:#E03A2F">0/36</div><div class="k">3 raw → 0 corrected · national CI [−117,+49] mm/century spans zero</div></div>
+<div class="mosaic w">
+  <div class="ex"><b>W RAJASTHAN</b>+58</div><div><b>PUNJAB</b><span class="def">−28</span></div><div><b>HAR-DELHI</b><span class="def">−14</span></div>
+  <div><b>UTTARAKH</b><span class="ok">+6</span></div><div><b>W U.P.</b><span class="ok">+3</span></div><div><b>E U.P.</b><span class="def">−9</span></div>
+  <div><b>BIHAR</b><span class="def">−31</span></div><div><b>JHARKHAND</b><span class="ok">+8</span></div><div><b>E RAJASTHAN</b><span class="ok">+12</span></div>
+  <div><b>W M.P.</b><span class="ok">+5</span></div><div><b>E M.P.</b><span class="ok">+2</span></div><div><b>GUJARAT</b><span class="ok">+21</span></div>
+  <div><b>SAURASHT</b><span class="ok">+75</span></div><div><b>KONKAN</b><span class="ok">+9</span></div><div><b>M MAHAR</b><span class="def">−6</span></div>
+  <div><b>MARATHW</b><span class="ok">+14</span></div><div><b>VIDARBHA</b><span class="ok">+4</span></div><div><b>CHHATTIS</b><span class="def">−3</span></div>
+  <div class="wl"><b>ODISHA</b><span class="def">−11</span></div><div><b>COASTAL AP</b><span class="ok">+1</span></div><div><b>TELANGANA</b><span class="ok">+13</span></div>
+  <div><b>RAYALSEEM</b><span class="def">−8</span></div><div><b>TAMIL NADU</b><span class="ok">+16</span></div><div><b>COAST KARN</b><span class="def">−15</span></div>
+  <div><b>N INT KARN</b><span class="def">−19</span></div><div><b>S INT KARN</b><span class="def">−24</span></div><div><b>KERALA</b><span class="def">−34</span></div>
+  <div><b>LAKSHDWEP</b><span class="ok">+7</span></div><div><b>ASSAM-MEGH</b><span class="def">−22</span></div><div><b>NMMT</b><span class="def">−32</span></div>
+  <div><b>SHWB-SKK</b><span class="ok">+3</span></div><div><b>GANGETIC WB</b><span class="def">−15</span></div><div><b>ARUNACHAL</b><span class="def">−42</span></div>
+  <div><b>HIMACHAL</b><span class="ok">+20</span></div><div><b>J&amp;K</b><span class="ok">+4</span></div><div><b>A&amp;N ISL</b><span class="ok">+55</span></div><div class="wl"><b>2020 · GATED</b><span class="def">n/a</span></div>
+</div>
+<div class="ribbon w"><span class="tab">PLATE I — ALL-INDIA MONSOON DEPARTURE 1901–2026</span>
+  <svg viewBox="0 0 1300 120" preserveAspectRatio="none">
+    <line x1="0" y1="60" x2="1300" y2="60" stroke="#111" stroke-width="1" stroke-dasharray="4 4"/>
+    <path d="M0,66 10,60 20,72 30,55 40,68 50,52 60,66 70,48 80,64 90,74 100,58 110,50 120,70 130,56
+    140,76 150,52 160,66 170,46 180,60 190,74 200,54 210,68 220,44 230,62 240,78 250,50 260,66 270,46
+    280,62 290,80 300,56 310,72 320,48 330,64 340,82 350,58 360,74 370,50 380,66 390,84 400,60 410,76
+    420,52 430,68 440,88 450,64 460,80 470,56 480,72 490,48 500,64 510,80 520,58 530,74 540,50 550,66
+    560,84 570,60 580,76 590,52 600,68 610,86 620,62 630,78 640,54 650,70 660,88 670,64 680,80 690,56
+    700,72 710,90 720,66 730,82 740,58 750,74 760,92 770,68 780,84 790,60 800,76 810,94 820,70 830,86
+    840,62 850,78 860,96 870,72 880,88 890,64 900,80 910,98 920,74 930,90 940,66 950,82 960,104 970,80
+    980,96 990,72 1000,88 1010,106 1020,82 1030,98 1040,74 1050,90 1060,108 1070,84 1080,100 1090,76
+    1100,92 1110,110 1120,86 1130,102 1140,78 1150,94 1160,112 1170,88 1180,104 1190,80 1200,96 1210,114
+    1220,90 1230,106 1240,82 1250,98 1260,116 1270,92 1280,108 1290,84 1300,120"
+    fill="none" stroke="#E03A2F" stroke-width="1.6"/>
+  </svg></div>
+<footer><span>VARSA · 125 YEARS · IMD OBSERVED + PIPELINE</span><span>2026 PROVISIONAL · 2020 GATED</span></footer>
+</div>
+</body></html>
