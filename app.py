@@ -33,52 +33,52 @@ _DARK = bool(st.session_state.get("dark_mode", False))
 
 if _DARK:
     T = dict(
-        bg="linear-gradient(160deg, #070c16 0%, #0c1424 50%, #060f18 100%)",
-        bg_solid="#080d1a",
-        sidebar="linear-gradient(180deg, #0b1326 0%, #060a14 100%)",
-        side_border="rgba(34, 197, 94, 0.35)",  # distinct neon green sidebar border
-        text="#f1f5f9", muted="#94a3b8", faint="#64748b",
-        card="rgba(15, 23, 42, 0.88)", card2="rgba(17, 27, 49, 0.94)",
-        border="rgba(34, 197, 94, 0.42)", hover="rgba(56, 189, 248, 0.85)",
-        hero="linear-gradient(135deg, rgba(34, 197, 94, 0.16) 0%, rgba(56, 189, 248, 0.12) 100%)",
-        accent="#22c55e", accent_soft="rgba(34, 197, 94, 0.18)", accent_border="rgba(34, 197, 94, 0.55)",
-        blue="#38bdf8", blue_soft="rgba(56, 189, 248, 0.18)", blue_border="rgba(56, 189, 248, 0.55)",
-        purple="#a855f7", amber="#f59e0b", title="#f8fafc",
-        value="#ffffff", grid="rgba(255,255,255,0.07)",
-        hr="rgba(34, 197, 94, 0.25)", chip="rgba(255,255,255,0.08)",
-        foot="#64748b", font="'Outfit', 'Inter', -apple-system, sans-serif",
-        shadow="0 14px 40px -8px rgba(0, 0, 0, 0.75), 0 0 16px rgba(34, 197, 94, 0.14)",
-        shadow_hover="0 24px 55px -10px rgba(0, 0, 0, 0.85), 0 0 28px rgba(56, 189, 248, 0.35)",
-        outline_map="1.5px solid rgba(56, 189, 248, 0.65)",
-        glow_map="0 0 25px rgba(56, 189, 248, 0.20)",
-        outline_dossier="1.5px solid rgba(34, 197, 94, 0.65)",
-        glow_dossier="0 0 25px rgba(34, 197, 94, 0.20)",
-        outline_hero="1.5px solid rgba(168, 85, 247, 0.55)",
-        glow_hero="0 0 25px rgba(168, 85, 247, 0.18)",
+        bg="#14120F",
+        bg_solid="#14120F",
+        sidebar="#1B1815",
+        side_border="rgba(242, 239, 231, 0.3)",
+        text="#F2EFE7", muted="#B5AC9C", faint="#8A8172",
+        card="rgba(24, 22, 18, 0.92)", card2="rgba(30, 27, 22, 0.94)",
+        border="rgba(242, 239, 231, 0.26)", hover="rgba(224, 122, 74, 0.85)",
+        hero="#1B1815",
+        accent="#E07A4A", accent_soft="rgba(224, 122, 74, 0.16)", accent_border="rgba(224, 122, 74, 0.55)",
+        blue="#7FB3C4", blue_soft="rgba(127, 179, 196, 0.14)", blue_border="rgba(127, 179, 196, 0.5)",
+        purple="#c9a0dc", amber="#e8b84b", title="#F2EFE7",
+        value="#F2EFE7", grid="rgba(242,239,231,0.09)",
+        hr="rgba(242, 239, 231, 0.22)", chip="rgba(242,239,231,0.07)",
+        foot="#8A8172", font="'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        shadow="0 1px 2px rgba(0, 0, 0, 0.4)",
+        shadow_hover="0 2px 8px rgba(0, 0, 0, 0.55)",
+        outline_map="1.5px solid rgba(242, 239, 231, 0.65)",
+        glow_map="none",
+        outline_dossier="1.5px solid rgba(224, 122, 74, 0.6)",
+        glow_dossier="none",
+        outline_hero="1.5px solid rgba(242, 239, 231, 0.55)",
+        glow_hero="none",
     )
 else:
     T = dict(
-        bg="linear-gradient(150deg, #fbf7ee 0%, #f6f0df 45%, #eee3ce 100%)",
-        bg_solid="#f7f2e6",
-        sidebar="linear-gradient(180deg, #f5ecd9 0%, #ece0c5 100%)",
-        side_border="rgba(165, 135, 90, 0.32)",
-        text="#000000", muted="#374151", faint="#4b5563",
-        card="rgba(255, 253, 247, 0.94)", card2="rgba(255, 252, 243, 0.98)",
-        border="rgba(175, 142, 95, 0.32)", hover="rgba(21, 128, 61, 0.65)",
-        hero="linear-gradient(135deg, rgba(21, 128, 61, 0.10) 0%, rgba(180, 83, 9, 0.08) 100%)",
-        accent="#15803d", accent_soft="rgba(21, 128, 61, 0.12)", accent_border="rgba(21, 128, 61, 0.38)",
-        blue="#0369a1", blue_soft="rgba(3, 105, 161, 0.12)", blue_border="rgba(3, 105, 161, 0.35)",
-        purple="#6b21a8", amber="#b45309", title="#000000",
-        value="#000000", grid="rgba(130, 100, 60, 0.10)",
-        hr="rgba(175, 142, 95, 0.28)", chip="rgba(238, 226, 206, 0.85)",
-        foot="#4b5563", font="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-        shadow="0 10px 30px -8px rgba(78, 62, 38, 0.10), 0 2px 8px rgba(78, 62, 38, 0.05)",
-        shadow_hover="0 20px 45px -10px rgba(78, 62, 38, 0.18), 0 4px 14px rgba(21, 128, 61, 0.12)",
-        outline_map="1px solid rgba(175, 142, 95, 0.35)",
+        bg="#FAF9F5",
+        bg_solid="#FAF9F5",
+        sidebar="#F1EFE7",
+        side_border="rgba(28, 25, 23, 0.45)",
+        text="#1C1917", muted="#4A443C", faint="#6B655B",
+        card="#FCFBF7", card2="#F4F2EA",
+        border="rgba(28, 25, 23, 0.34)", hover="rgba(156, 61, 27, 0.8)",
+        hero="#F1EFE7",
+        accent="#9C3D1B", accent_soft="rgba(192, 83, 46, 0.12)", accent_border="rgba(156, 61, 27, 0.55)",
+        blue="#2E5E6E", blue_soft="rgba(46, 94, 110, 0.12)", blue_border="rgba(46, 94, 110, 0.45)",
+        purple="#6b21a8", amber="#b45309", title="#1C1917",
+        value="#1C1917", grid="rgba(28, 25, 23, 0.12)",
+        hr="rgba(28, 25, 23, 0.3)", chip="#EFEDE4",
+        foot="#6B655B", font="'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        shadow="0 1px 2px rgba(28, 25, 23, 0.06)",
+        shadow_hover="0 2px 6px rgba(28, 25, 23, 0.1)",
+        outline_map="1.5px solid #1C1917",
         glow_map="none",
-        outline_dossier="1.5px solid rgba(21, 128, 61, 0.38)",
+        outline_dossier="1.5px solid rgba(156, 61, 27, 0.75)",
         glow_dossier="none",
-        outline_hero="1px solid rgba(175, 142, 95, 0.35)",
+        outline_hero="1.5px solid #1C1917",
         glow_hero="none",
     )
 
@@ -126,38 +126,36 @@ b, strong, [data-testid="stMarkdownContainer"] b, [data-testid="stMarkdownContai
 /* hero */
 .hero {{
   background: {T['hero']};
-  border: 1px solid {T['border']};
-  border-radius: 28px;
-  padding: 2.2rem 2.6rem;
+  border: 1.5px solid {T['border']};
+  border-radius: 3px;
+  padding: 2rem 2.4rem;
   margin-bottom: 1.6rem;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: {T['shadow']};
+  box-shadow: none;
 }}
 .hero:hover {{
-  transform: translateY(-3px);
-  box-shadow: {T['shadow_hover']};
+  border-color: {T['ink-accent'] if 'ink-accent' in T else T['accent']};
+  transform: none;
+  box-shadow: none;
 }}
 .hero h1 {{
+  font-family: "Bricolage Grotesque", "Public Sans", sans-serif !important;
   font-size: 2.65rem !important;
-  font-weight: 850;
-  letter-spacing: -0.04em;
+  font-weight: 800;
+  letter-spacing: -0.025em;
   margin-bottom: .3rem;
-  background: linear-gradient(92deg, {T['accent']} 0%, {T['blue']} 52%, {T['purple']} 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: {T['title']};
 }}
 .hero p {{ color: {T['muted']}; font-size: 1.05rem; margin: 0; line-height: 1.5; }}
 .hero .tag {{
   display: inline-block;
-  background: {T['accent_soft']};
-  color: {T['accent']};
-  border: 1px solid {T['accent_border']};
-  padding: .24rem .85rem;
-  border-radius: 999px;
-  font-size: .78rem;
-  font-weight: 750;
-  letter-spacing: .07em;
+  background: none;
+  color: {T['muted']};
+  border: none;
+  padding: 0 0 .5rem;
+  border-radius: 0;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .12em;
   text-transform: uppercase;
   margin-bottom: .9rem;
 }}
@@ -749,6 +747,33 @@ div[data-baseweb="slider"] div:has(> div[role="slider"]) {{
   50% {{ transform: scale(1.4); opacity: 0.6; }}
   100% {{ transform: scale(1); opacity: 1; }}
 }}
+
+/* ── The Survey Sheet — world overrides (DESIGN.md) ─────────────────────── */
+@font-face{{font-family:"Bricolage Grotesque";src:url("/app/static/fonts/bricolage-grotesque-600.woff2") format("woff2");font-weight:600;font-display:swap}}
+@font-face{{font-family:"Bricolage Grotesque";src:url("/app/static/fonts/bricolage-grotesque-700.woff2") format("woff2");font-weight:700;font-display:swap}}
+@font-face{{font-family:"Bricolage Grotesque";src:url("/app/static/fonts/bricolage-grotesque-800.woff2") format("woff2");font-weight:800;font-display:swap}}
+@font-face{{font-family:"Public Sans";src:url("/app/static/fonts/public-sans-400.woff2") format("woff2");font-weight:400;font-display:swap}}
+@font-face{{font-family:"Public Sans";src:url("/app/static/fonts/public-sans-600.woff2") format("woff2");font-weight:600;font-display:swap}}
+@font-face{{font-family:"Public Sans";src:url("/app/static/fonts/public-sans-700.woff2") format("woff2");font-weight:700;font-display:swap}}
+@font-face{{font-family:"Spline Sans Mono";src:url("/app/static/fonts/spline-sans-mono-400.woff2") format("woff2");font-weight:400;font-display:swap}}
+@font-face{{font-family:"Spline Sans Mono";src:url("/app/static/fonts/spline-sans-mono-600.woff2") format("woff2");font-weight:600;font-display:swap}}
+
+h1, h2, h3, .sect, .wordmark, .kpi .v {{
+  font-family: "Bricolage Grotesque", "Public Sans", sans-serif !important;
+  letter-spacing: -0.02em;
+}}
+.kpi .l, .stamp-mono {{ font-family: "Spline Sans Mono", monospace !important; }}
+.kpi, .card, .hero-card, [class*="card"] {{
+  border-radius: 3px !important;
+  box-shadow: none !important;
+}}
+.kpi {{ border-left: 1.5px solid {{T['border']}} !important; }}
+[data-testid="stButton"] button, [data-testid="stRadio"] label, [data-testid="stSlider"], .badge {{
+  border-radius: 2px !important;
+}}
+::selection {{ background: #C0532E; color: #FAF9F5; }}
+body, .stApp {{ text-wrap: pretty; }}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -1196,11 +1221,11 @@ with c_hero_toggle:
         st.session_state.dark_mode = bool(st.session_state.hero_theme_slider)
 
     is_dark_slider = st.toggle(
-        "🌙 Dark Mode" if _DARK else "☀️ Warm Cream",
+        "🌙 Ink Sheet" if _DARK else "▦ Survey Sheet",
         value=_DARK,
         key="hero_theme_slider",
         on_change=on_hero_theme_toggle_change,
-        help="Switch between Warm Cream and Midnight Dark theme",
+        help="Switch between the Survey Sheet (paper) and Ink Sheet themes",
     )
     if is_dark_slider != _DARK:
         st.session_state.dark_mode = is_dark_slider
@@ -1213,11 +1238,11 @@ st.markdown("<div style='margin-bottom:1.2rem;'></div>", unsafe_allow_html=True)
 # ── KPI row (real findings from VARSA) ───────────────────────────────────────
 st.markdown("""
 <div class="kpi-row">
-  <div class="kpi green"><div class="v">75.2%</div><div class="l">of rain falls Jun–Sep</div></div>
+  <div class="kpi green"><div class="v">73.7%</div><div class="l">of rain falls Jun–Sep</div></div>
   <div class="kpi blue"><div class="v">36</div><div class="l">meteorological subdivisions</div></div>
   <div class="kpi purple"><div class="v">125</div><div class="l">years of records (1901–2026)</div></div>
   <div class="kpi amber"><div class="v">23/115</div><div class="l">years below 90% of normal (1901–2015)</div></div>
-  <div class="kpi"><div class="v">η²=0.875</div><div class="l">region explains 87% of variance</div></div>
+  <div class="kpi"><div class="v">η²=0.861</div><div class="l">region explains 86% of variance</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1449,11 +1474,11 @@ if "clicked_div" not in st.session_state:
     st.session_state.clicked_div = None
 
 # Theme-aware plotly ink
-_TEXT_COLOR = "#000000" if not _DARK else "#f8fafc"
-_TITLE_COLOR = "#000000" if not _DARK else "#ffffff"
-_MUTED_COLOR = "#334155" if not _DARK else "#94a3b8"
-_GRID_C = "rgba(0, 0, 0, 0.08)" if not _DARK else "rgba(255, 255, 255, 0.08)"
-_AXIS_LINE = "rgba(0, 0, 0, 0.22)" if not _DARK else "rgba(255, 255, 255, 0.20)"
+_TEXT_COLOR = "#1C1917" if not _DARK else "#F2EFE7"
+_TITLE_COLOR = "#1C1917" if not _DARK else "#F2EFE7"
+_MUTED_COLOR = "#4A443C" if not _DARK else "#B5AC9C"
+_GRID_C = "rgba(28, 25, 23, 0.10)" if not _DARK else "rgba(242, 239, 231, 0.09)"
+_AXIS_LINE = "rgba(28, 25, 23, 0.32)" if not _DARK else "rgba(242, 239, 231, 0.24)"
 _PLOT_TEMPLATE = "plotly_white" if not _DARK else "plotly_dark"
 _FG = _TEXT_COLOR
 
@@ -1461,14 +1486,14 @@ _PAPER = dict(
     template=_PLOT_TEMPLATE,
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="'Outfit', 'Plus Jakarta Sans', 'Inter', sans-serif", color=_TEXT_COLOR),
-    title_font=dict(color=_TITLE_COLOR, size=15, family="'Outfit', 'Plus Jakarta Sans', sans-serif"),
+    font=dict(family="'Public Sans', sans-serif", color=_TEXT_COLOR),
+    title_font=dict(color=_TITLE_COLOR, size=15, family="'Bricolage Grotesque', 'Public Sans', sans-serif"),
     legend_font=dict(color=_TEXT_COLOR),
 )
 
 def render_risk_table(df, is_dark):
     bg_table = "rgba(255, 253, 247, 0.95)" if not is_dark else "rgba(15, 23, 42, 0.90)"
-    bg_th = "#f5ebd7" if not is_dark else "#1e293b"
+    bg_th = "#F1EFE7" if not is_dark else "#26221C"
     text_c = "#000000" if not is_dark else "#f8fafc"
     border_c = "rgba(175, 142, 95, 0.28)" if not is_dark else "rgba(255, 255, 255, 0.08)"
     row_even = "rgba(120, 95, 60, 0.04)" if not is_dark else "rgba(255, 255, 255, 0.02)"
@@ -1522,7 +1547,7 @@ def render_risk_table(df, is_dark):
 
 def render_extremes_table(df, is_dark, is_wet=True):
     bg_table = "rgba(255, 253, 247, 0.95)" if not is_dark else "rgba(15, 23, 42, 0.90)"
-    bg_th = "#f5ebd7" if not is_dark else "#1e293b"
+    bg_th = "#F1EFE7" if not is_dark else "#26221C"
     text_c = "#000000" if not is_dark else "#f8fafc"
     border_c = "rgba(175, 142, 95, 0.28)" if not is_dark else "rgba(255, 255, 255, 0.08)"
     row_even = "rgba(120, 95, 60, 0.04)" if not is_dark else "rgba(255, 255, 255, 0.02)"
