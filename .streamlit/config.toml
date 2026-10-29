@@ -1,2 +1,9 @@
 [server]
 staticFolderPath = "static"
+
+[theme]
+base = "light"
+primaryColor = "#C0532E"
+backgroundColor = "#FAF9F5"
+secondaryBackgroundColor = "#F1EFE7"
+textColor = "#1C1917"
